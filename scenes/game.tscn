@@ -1,0 +1,219 @@
+[gd_scene load_steps=15 format=3 uid="uid://b005746ocb26f"]
+
+[ext_resource type="Script" uid="uid://bvo2weury7lmn" path="res://scripts/game.gd" id="1_dfpl8"]
+[ext_resource type="Texture2D" uid="uid://dimke74rxsota" path="res://sprites/floor.png" id="2_02i57"]
+[ext_resource type="Texture2D" uid="uid://b15p5fco2gbhi" path="res://sprites/guy.png" id="2_hck8m"]
+[ext_resource type="Texture2D" uid="uid://1d566jtgexy3" path="res://sprites/shaod.png" id="2_mwa01"]
+[ext_resource type="Texture2D" uid="uid://clb5fx5al2tp6" path="res://sprites/youwin.png" id="3_6clqb"]
+[ext_resource type="Texture2D" uid="uid://djrx06mjp361j" path="res://sprites/wall1.jpeg" id="4_i0oqb"]
+[ext_resource type="Texture2D" uid="uid://beyvnnw8hpewc" path="res://sprites/life.png" id="6_qejtg"]
+[ext_resource type="Texture2D" uid="uid://buvwrkjsdlnfc" path="res://sprites/crack1.png" id="7_bob2h"]
+[ext_resource type="Texture2D" uid="uid://c7tx8m2ydg8hh" path="res://sprites/crack2.png" id="8_fx1v0"]
+[ext_resource type="Texture2D" uid="uid://cbe2yisg1h5pn" path="res://sprites/crack3.png" id="9_7irkr"]
+[ext_resource type="Texture2D" uid="uid://dup0nwg5knqrw" path="res://sprites/shmile.png" id="11_qbotp"]
+[ext_resource type="Texture2D" uid="uid://dl6epd0ddldfe" path="res://sprites/youlose.png" id="12_cfp5y"]
+[ext_resource type="Texture2D" uid="uid://c54cxpnlyogsl" path="res://sprites/arrow.png" id="13_y3oq7"]
+
+[sub_resource type="Curve" id="Curve_vcsiq"]
+_data = [Vector2(0, 1), 0.0, -0.0769558, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="game" type="Node2D"]
+position = Vector2(-1, 0)
+script = ExtResource("1_dfpl8")
+
+[node name="camera" type="Camera2D" parent="."]
+position = Vector2(576, 324)
+offset = Vector2(576, 324)
+
+[node name="Floor" type="Sprite2D" parent="."]
+position = Vector2(589.25, 343.5)
+scale = Vector2(0.927734, 1.04583)
+texture = ExtResource("2_02i57")
+
+[node name="Youwinshadow" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 0.262745)
+position = Vector2(569, 191)
+scale = Vector2(0.554245, 0.554245)
+texture = ExtResource("3_6clqb")
+
+[node name="Youwin" type="Sprite2D" parent="."]
+position = Vector2(564, 176)
+scale = Vector2(0.554245, 0.554245)
+texture = ExtResource("3_6clqb")
+
+[node name="Wall" type="Sprite2D" parent="."]
+modulate = Color(0.776471, 0.607843, 0.678431, 1)
+position = Vector2(571, 108)
+scale = Vector2(1.6028, 1.64444)
+texture = ExtResource("4_i0oqb")
+region_enabled = true
+region_rect = Rect2(-1, -1.5, 563.935, 341.392)
+
+[node name="Crack4" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0)
+position = Vector2(584, 194.5)
+scale = Vector2(1.2825, 1.16625)
+texture = ExtResource("9_7irkr")
+
+[node name="cracks" type="Node2D" parent="."]
+
+[node name="Crack1" type="Sprite2D" parent="cracks"]
+visible = false
+modulate = Color(1, 1, 1, 0.545098)
+position = Vector2(303, 173)
+scale = Vector2(0.288732, 0.288732)
+texture = ExtResource("7_bob2h")
+
+[node name="Crack2" type="Sprite2D" parent="cracks"]
+visible = false
+modulate = Color(1, 1, 1, 0.498039)
+position = Vector2(812, 197)
+scale = Vector2(0.33, 0.33)
+texture = ExtResource("8_fx1v0")
+
+[node name="Crack3" type="Sprite2D" parent="cracks"]
+visible = false
+modulate = Color(1, 1, 1, 0.545098)
+position = Vector2(563, 135)
+scale = Vector2(0.43, 0.43)
+texture = ExtResource("9_7irkr")
+
+[node name="Floor2" type="Sprite2D" parent="."]
+position = Vector2(625, 798)
+scale = Vector2(0.86069, 1.09377)
+texture = ExtResource("2_02i57")
+
+[node name="darkline" type="Sprite2D" parent="."]
+self_modulate = Color(0.745098, 0.745098, 0.745098, 1)
+position = Vector2(581, 394.328)
+scale = Vector2(0.808203, 0.018533)
+texture = ExtResource("2_02i57")
+
+[node name="shadow" type="Sprite2D" parent="."]
+position = Vector2(592, 320)
+scale = Vector2(0.488233, 0.488233)
+texture = ExtResource("2_mwa01")
+region_enabled = true
+region_rect = Rect2(100, 122, 372, 1061)
+
+[node name="wallpart" type="CPUParticles2D" parent="."]
+position = Vector2(811, 269)
+emitting = false
+amount = 5
+texture = ExtResource("6_qejtg")
+lifetime = 5.0
+one_shot = true
+speed_scale = 6.51
+explosiveness = 1.0
+fixed_fps = 30
+draw_order = 1
+direction = Vector2(1, 1)
+spread = 180.0
+gravity = Vector2(0, 100)
+initial_velocity_min = 70.51
+initial_velocity_max = 120.0
+scale_amount_min = 0.05
+scale_amount_max = 0.08
+scale_amount_curve = SubResource("Curve_vcsiq")
+color = Color(0.576471, 0.270588, 0.27451, 1)
+
+[node name="arrow" type="Sprite2D" parent="."]
+position = Vector2(835.547, 572.25)
+scale = Vector2(0.188162, 0.263044)
+texture = ExtResource("13_y3oq7")
+
+[node name="shadarrow" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(580, 200)
+scale = Vector2(0.185052, 0.258696)
+texture = ExtResource("13_y3oq7")
+
+[node name="puncher" type="Sprite2D" parent="."]
+position = Vector2(568.594, 509.715)
+scale = Vector2(0.824207, 0.824207)
+texture = ExtResource("2_hck8m")
+region_enabled = true
+region_rect = Rect2(57, 305, 331, 388)
+
+[node name="blackbar1" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(1.00009, 316)
+scale = Vector2(0.220313, 1.29167)
+texture = ExtResource("2_02i57")
+
+[node name="blackbar2" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(1160.25, 299.5)
+scale = Vector2(0.230859, 1.17361)
+texture = ExtResource("2_02i57")
+
+[node name="waiter" type="Timer" parent="."]
+wait_time = 0.4
+one_shot = true
+
+[node name="lives" type="Node2D" parent="."]
+
+[node name="life0" type="Sprite2D" parent="lives"]
+position = Vector2(69, 125)
+scale = Vector2(0.119301, 0.119301)
+texture = ExtResource("6_qejtg")
+
+[node name="life1" type="Sprite2D" parent="lives"]
+position = Vector2(72, 217)
+scale = Vector2(0.119301, 0.119301)
+texture = ExtResource("6_qejtg")
+
+[node name="life2" type="Sprite2D" parent="lives"]
+position = Vector2(71, 309)
+scale = Vector2(0.119301, 0.119301)
+texture = ExtResource("6_qejtg")
+
+[node name="life3" type="Sprite2D" parent="lives"]
+position = Vector2(73, 403)
+scale = Vector2(0.119301, 0.119301)
+texture = ExtResource("6_qejtg")
+
+[node name="life4" type="Sprite2D" parent="lives"]
+position = Vector2(74, 493)
+scale = Vector2(0.119301, 0.119301)
+texture = ExtResource("6_qejtg")
+
+[node name="life5" type="Sprite2D" parent="lives"]
+position = Vector2(1075.74, 134.625)
+scale = Vector2(0.119301, 0.119301)
+texture = ExtResource("6_qejtg")
+
+[node name="life6" type="Sprite2D" parent="lives"]
+position = Vector2(1078.74, 226.625)
+scale = Vector2(0.119301, 0.119301)
+texture = ExtResource("6_qejtg")
+
+[node name="life7" type="Sprite2D" parent="lives"]
+position = Vector2(1077.74, 318.625)
+scale = Vector2(0.119301, 0.119301)
+texture = ExtResource("6_qejtg")
+
+[node name="life8" type="Sprite2D" parent="lives"]
+position = Vector2(1079.74, 412.625)
+scale = Vector2(0.119301, 0.119301)
+texture = ExtResource("6_qejtg")
+
+[node name="life9" type="Sprite2D" parent="lives"]
+position = Vector2(1080.74, 502.625)
+scale = Vector2(0.119301, 0.119301)
+texture = ExtResource("6_qejtg")
+
+[node name="Shmile" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(568, 438)
+scale = Vector2(0.28588, 0.28588)
+texture = ExtResource("11_qbotp")
+
+[node name="Youlose" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0)
+position = Vector2(581, 323)
+scale = Vector2(1.41109, 1.41109)
+texture = ExtResource("12_cfp5y")
+
+[connection signal="timeout" from="waiter" to="." method="_on_waiter_timeout"]
