@@ -2,7 +2,7 @@ extends Node2D
 var arrowNumb = -1
 var wasdNumb = -1
 var hits = 0
-var tries = 10
+var tries = 3
 @export var RANDOM_SHAKE_STRENGTH: float = 30.0
 @export var SHAKE_DECAY_RATE: float = 5.0
 @onready var camera = $camera
@@ -130,7 +130,7 @@ func _process(delta):
 			$shadarrow.set_rotation_degrees(0)
 			$shadarrow.set_position((lerp($shadarrow.get_position(), Vector2(660, 200), delta * 8)))	
 	
-	if (tries < 10):
+	if (tries < 3):
 		get_node("lives/life" + str(tries)).scale = lerp(get_node("lives/life" + str(tries)).scale, Vector2(0, 0), delta * 10)
 	
 	if (hits == 4):
