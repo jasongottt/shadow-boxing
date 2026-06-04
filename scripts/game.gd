@@ -176,7 +176,6 @@ func update_lives(delta: float) -> void:
 		var life = get_node("lives/life" + str(tries))
 		life.scale = lerp(life.scale, Vector2.ZERO, delta * 10)
 
-
 func play_lose_animation(delta: float) -> void:
 	lose_started = true
 	$shadow.scale = lerp($shadow.scale, Vector2(5, 5), delta * 2)
