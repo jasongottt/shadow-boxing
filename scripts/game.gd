@@ -54,7 +54,6 @@ func _process(delta: float) -> void:
 	else:
 		update_attack_visuals(delta)
 
-
 func handle_player_inputs() -> void:
 	if arrowNumb == DIR_NONE:
 		if Input.is_action_just_pressed("up"):
@@ -76,38 +75,31 @@ func handle_player_inputs() -> void:
 		elif Input.is_action_just_pressed("d"):
 			set_wasd_input(DIR_RIGHT)
 
-
 func set_arrow_input(direction: int) -> void:
 	arrowNumb = direction
 	flash_puncher()
 
-
 func set_wasd_input(direction: int) -> void:
 	wasdNumb = direction
 	flash_shadow()
-
 
 func flash_puncher() -> void:
 	$puncher.set_modulate(Color(0.84, 0.31, 0.21, 1))
 	await get_tree().create_timer(0.05).timeout
 	$puncher.set_modulate(Color(1, 1, 1, 1))
 
-
 func flash_shadow() -> void:
 	$shadow.set_modulate(Color(1, 1, 1, 0.5))
 	await get_tree().create_timer(0.05).timeout
 	$shadow.set_modulate(Color(1, 1, 1, 1))
 
-
 func start_attack() -> void:
 	$waiter.start()
 	$wallpart.restart()
 
-
 func update_attack_visuals(delta: float) -> void:
 	update_puncher_visuals(delta)
 	update_shadow_visuals(delta)
-
 
 func update_puncher_visuals(delta: float) -> void:
 	match arrowNumb:
@@ -136,7 +128,6 @@ func update_puncher_visuals(delta: float) -> void:
 			$puncher.set_region_rect(Rect2(436, 52, 566, 578))
 			$arrow.set_rotation_degrees(0)
 			$arrow.set_position(lerp($arrow.get_position(), Vector2(940, 560), delta * 8))
-
 
 func update_shadow_visuals(delta: float) -> void:
 	match wasdNumb:
