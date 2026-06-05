@@ -6,6 +6,11 @@ const DIR_DOWN := 2
 const DIR_LEFT := 3
 const DIR_RIGHT := 4
 
+@export var p1_color = Color(0.825, 0.332, 0.387, 1.0)
+@export var p2_color = Color(0.319, 0.533, 0.769, 1.0)
+
+var current_player := 1
+
 var arrowNumb := DIR_NONE
 var wasdNumb := DIR_NONE
 
@@ -13,7 +18,6 @@ var hits := 0
 var tries := 3
 
 var wall_breaking := false
-var lose_started := false
 
 @export var RANDOM_SHAKE_STRENGTH: float = 30.0
 @export var SHAKE_DECAY_RATE: float = 5.0
@@ -26,6 +30,7 @@ var shake_strength: float = 0.0
 
 func _ready() -> void:
 	rand.randomize()
+	set_player_color()
 
 
 func _process(delta: float) -> void:
@@ -33,7 +38,7 @@ func _process(delta: float) -> void:
 	update_lives(delta)
 
 	if tries <= 0 and hits < 3:
-		play_lose_animation(delta)
+		switch_player()
 		return
 
 	if hits == 3 and !wall_breaking:
@@ -53,6 +58,7 @@ func _process(delta: float) -> void:
 			start_attack()
 	else:
 		update_attack_visuals(delta)
+
 
 func handle_player_inputs() -> void:
 	if arrowNumb == DIR_NONE:
@@ -75,31 +81,69 @@ func handle_player_inputs() -> void:
 		elif Input.is_action_just_pressed("d"):
 			set_wasd_input(DIR_RIGHT)
 
+
 func set_arrow_input(direction: int) -> void:
 	arrowNumb = direction
 	flash_puncher()
+
 
 func set_wasd_input(direction: int) -> void:
 	wasdNumb = direction
 	flash_shadow()
 
+
 func flash_puncher() -> void:
 	$puncher.set_modulate(Color(0.84, 0.31, 0.21, 1))
 	await get_tree().create_timer(0.05).timeout
-	$puncher.set_modulate(Color(1, 1, 1, 1))
+	set_player_color()
+
 
 func flash_shadow() -> void:
 	$shadow.set_modulate(Color(1, 1, 1, 0.5))
 	await get_tree().create_timer(0.05).timeout
-	$shadow.set_modulate(Color(1, 1, 1, 1))
+	set_player_color()
+
+
+func set_player_color() -> void:
+	var color = p1_color
+
+	if current_player == 2:
+		color = p2_color
+
+	$puncher.set_modulate(color)
+	$shadow.set_modulate(color)
+
+
+func switch_player() -> void:
+	if current_player == 1:
+		current_player = 2
+	else:
+		current_player = 1
+
+	tries = 3
+	arrowNumb = DIR_NONE
+	wasdNumb = DIR_NONE
+
+	reset_puncher()
+	reset_shadow()
+	set_player_color()
+	reset_lives()
+
+
+func reset_lives() -> void:
+	for i in range(3):
+		get_node("lives/life" + str(i)).scale = Vector2(0.119, 0.119)
+
 
 func start_attack() -> void:
 	$waiter.start()
 	$wallpart.restart()
 
+
 func update_attack_visuals(delta: float) -> void:
 	update_puncher_visuals(delta)
 	update_shadow_visuals(delta)
+
 
 func update_puncher_visuals(delta: float) -> void:
 	match arrowNumb:
@@ -128,6 +172,7 @@ func update_puncher_visuals(delta: float) -> void:
 			$puncher.set_region_rect(Rect2(436, 52, 566, 578))
 			$arrow.set_rotation_degrees(0)
 			$arrow.set_position(lerp($arrow.get_position(), Vector2(940, 560), delta * 8))
+
 
 func update_shadow_visuals(delta: float) -> void:
 	match wasdNumb:
@@ -172,17 +217,11 @@ func reset_shadow() -> void:
 
 
 func update_lives(delta: float) -> void:
-	if tries < 3 and tries >= 0:
-		var life = get_node("lives/life" + str(tries))
+	var lost_lives := 3 - tries
+
+	for i in range(lost_lives):
+		var life = get_node("lives/life" + str(i))
 		life.scale = lerp(life.scale, Vector2.ZERO, delta * 10)
-
-func play_lose_animation(delta: float) -> void:
-	lose_started = true
-	$shadow.scale = lerp($shadow.scale, Vector2(5, 5), delta * 2)
-	$Youlose.set_modulate(lerp($Youlose.get_modulate(), Color(1, 1, 1, 1), delta * 3))
-
-	if $waiter.is_stopped():
-		$waiter.start()
 
 
 func apply_shake() -> void:
@@ -202,7 +241,7 @@ func get_random_offset() -> Vector2:
 
 
 func _on_waiter_timeout() -> void:
-	if wall_breaking or lose_started:
+	if wall_breaking:
 		return
 
 	if wasdNumb == arrowNumb:
