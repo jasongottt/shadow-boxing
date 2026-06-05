@@ -13,7 +13,7 @@ var current_player := 1
 
 var arrowNumb := DIR_NONE
 var wasdNumb := DIR_NONE
-
+var hitlist = []
 var hits := 0
 var tries := 3
 
@@ -113,6 +113,30 @@ func set_player_color() -> void:
 	$puncher.set_modulate(color)
 	$shadow.set_modulate(color)
 
+func switch_animation():
+	var switch_sprite = $switch
+	switch_sprite.show()
+	switch_sprite.scale = Vector2(0.1, 0.1)
+	switch_sprite.modulate = p1_color
+	var scale_tween = create_tween()
+	var flash_tween = create_tween()
+	scale_tween.tween_property(
+		switch_sprite,
+		"scale",
+		Vector2(0.674, 0.674),
+		0.8
+	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	for i in range(6):
+		flash_tween.tween_property(switch_sprite, "modulate", p1_color, 0.18)
+		flash_tween.tween_property(switch_sprite, "modulate", p2_color, 0.18)
+	scale_tween.tween_property(
+		switch_sprite,
+		"scale",
+		Vector2.ZERO,
+		0.2
+	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	await scale_tween.finished
+	switch_sprite.hide()
 
 func switch_player() -> void:
 	if current_player == 1:
@@ -121,9 +145,11 @@ func switch_player() -> void:
 		current_player = 1
 
 	tries = 3
+	hits = 0;
 	arrowNumb = DIR_NONE
 	wasdNumb = DIR_NONE
 
+	await switch_animation()
 	reset_puncher()
 	reset_shadow()
 	set_player_color()
@@ -139,40 +165,29 @@ func start_attack() -> void:
 	$waiter.start()
 	$wallpart.restart()
 
-
 func update_attack_visuals(delta: float) -> void:
 	update_puncher_visuals(delta)
 	update_shadow_visuals(delta)
-
 
 func update_puncher_visuals(delta: float) -> void:
 	match arrowNumb:
 		DIR_UP:
 			$wallpart.set_position(Vector2(613, 133))
-			$puncher.set_region_rect(Rect2(1682, 28, 317, 900))
-			$arrow.set_rotation_degrees(270)
-			$arrow.set_position(lerp($arrow.get_position(), Vector2(600, 230), delta * 8))
+			$puncher.play("up")
 
 		DIR_DOWN:
 			$wallpart.set_position(Vector2(610, 350))
-			$puncher.set_region_rect(Rect2(2166, 210, 250, 455))
-			$arrow.set_rotation_degrees(90)
-			$arrow.set_position(lerp($arrow.get_position(), Vector2(560, 760), delta * 8))
+			$puncher.play("down")
 
 		DIR_LEFT:
 			$wallpart.set_position(Vector2(322, 265))
 			$puncher.set_position(Vector2(468.594, 509.715))
-			$puncher.set_region_rect(Rect2(1051, 135, 566, 578))
-			$arrow.set_rotation_degrees(180)
-			$arrow.set_position(lerp($arrow.get_position(), Vector2(220, 560), delta * 8))
+			$puncher.play("left")
 
 		DIR_RIGHT:
 			$wallpart.set_position(Vector2(811, 269))
 			$puncher.set_position(Vector2(668.594, 509.715))
-			$puncher.set_region_rect(Rect2(436, 52, 566, 578))
-			$arrow.set_rotation_degrees(0)
-			$arrow.set_position(lerp($arrow.get_position(), Vector2(940, 560), delta * 8))
-
+			$puncher.play("right")
 
 func update_shadow_visuals(delta: float) -> void:
 	match wasdNumb:
@@ -180,40 +195,28 @@ func update_shadow_visuals(delta: float) -> void:
 			$shadow.set_position(Vector2(576, 335))
 			$shadow.set_scale(Vector2(0.492, 0.492))
 			$shadow.set_region_rect(Rect2(2281, 127, 777, 1326))
-			$shadarrow.set_rotation_degrees(270)
-			$shadarrow.set_position(lerp($shadarrow.get_position(), Vector2(560, 0), delta * 8))
 
 		DIR_DOWN:
 			$shadow.set_scale(Vector2(0.488, 0.488))
 			$shadow.set_position(Vector2(582, 499))
 			$shadow.set_region_rect(Rect2(2281, 127, 777, 1126))
-			$shadarrow.set_rotation_degrees(90)
-			$shadarrow.set_position(lerp($shadarrow.get_position(), Vector2(560, 300), delta * 8))
 
 		DIR_LEFT:
 			$shadow.set_position(Vector2(331, 370))
 			$shadow.set_region_rect(Rect2(588, 140, 690, 1121))
-			$shadarrow.set_rotation_degrees(180)
-			$shadarrow.set_position(lerp($shadarrow.get_position(), Vector2(460, 200), delta * 8))
 
 		DIR_RIGHT:
 			$shadow.set_position(Vector2(796, 360))
 			$shadow.set_region_rect(Rect2(1427, 149, 690, 1121))
-			$shadarrow.set_rotation_degrees(0)
-			$shadarrow.set_position(lerp($shadarrow.get_position(), Vector2(660, 200), delta * 8))
-
 
 func reset_puncher() -> void:
-	$puncher.set_region_rect(Rect2(57, 305, 331, 388))
-	$puncher.set_position(Vector2(568.594, 509.715))
-	$arrow.set_position(Vector2(560, 560))
-
+	$puncher.play("default")
+	$puncher.set_position(Vector2(568.594, 479.715))
 
 func reset_shadow() -> void:
 	$shadow.set_region_rect(Rect2(100, 122, 372, 1061))
 	$shadow.set_position(Vector2(540, 344))
 	$shadow.set_scale(Vector2(0.534, 0.534))
-	$shadarrow.set_position(Vector2(560, 200))
 
 
 func update_lives(delta: float) -> void:

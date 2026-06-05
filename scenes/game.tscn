@@ -12,73 +12,74 @@
 [ext_resource type="Texture2D" uid="uid://cbe2yisg1h5pn" path="res://sprites/crack3.png" id="9_7irkr"]
 [ext_resource type="Texture2D" uid="uid://dup0nwg5knqrw" path="res://sprites/shmile.png" id="11_qbotp"]
 [ext_resource type="Texture2D" uid="uid://dl6epd0ddldfe" path="res://sprites/youlose.png" id="12_cfp5y"]
-[ext_resource type="Texture2D" uid="uid://c54cxpnlyogsl" path="res://sprites/arrow.png" id="13_y3oq7"]
 [ext_resource type="Texture2D" uid="uid://0u5iwky8kddt" path="res://sprites/switch.png" id="14_trtic"]
 
 [sub_resource type="Curve" id="Curve_vcsiq"]
 _data = [Vector2(0, 1), 0.0, -0.0769558, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 2
 
-[sub_resource type="Animation" id="Animation_trtic"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("switch:scale")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0.57374626, 0.5737463)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("switch:modulate")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
-}
+[sub_resource type="AtlasTexture" id="AtlasTexture_kvuet"]
+atlas = ExtResource("2_hck8m")
+region = Rect2(0, 0, 421, 764)
 
-[sub_resource type="Animation" id="Animation_ir15t"]
-resource_name = "switch"
-length = 0.6
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("switch:scale")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.6),
-"transitions": PackedFloat32Array(2.8284268, 1),
-"update": 0,
-"values": [Vector2(0.244, 0.244), Vector2(0.654, 0.654)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("switch:modulate")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
-}
+[sub_resource type="AtlasTexture" id="AtlasTexture_trtic"]
+atlas = ExtResource("2_hck8m")
+region = Rect2(2105, 0, 421, 764)
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_ca42v"]
-_data = {
-&"RESET": SubResource("Animation_trtic"),
-&"switch": SubResource("Animation_ir15t")
-}
+[sub_resource type="AtlasTexture" id="AtlasTexture_ca42v"]
+atlas = ExtResource("2_hck8m")
+region = Rect2(1026, 0, 625, 764)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ir15t"]
+atlas = ExtResource("2_hck8m")
+region = Rect2(420, 0, 625, 764)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rysoc"]
+atlas = ExtResource("2_hck8m")
+region = Rect2(1684, 0, 421, 764)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ssvqc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kvuet")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_trtic")
+}],
+"loop": true,
+"name": &"down",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ca42v")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ir15t")
+}],
+"loop": true,
+"name": &"right",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rysoc")
+}],
+"loop": true,
+"name": &"up",
+"speed": 5.0
+}]
 
 [node name="game" type="Node2D" unique_id=1041176778]
 script = ExtResource("1_dfpl8")
@@ -179,34 +180,25 @@ scale_amount_max = 0.08
 scale_amount_curve = SubResource("Curve_vcsiq")
 color = Color(0.576471, 0.270588, 0.27451, 1)
 
-[node name="arrow" type="Sprite2D" parent="." unique_id=82452548]
-position = Vector2(835.547, 572.25)
-scale = Vector2(0.188162, 0.263044)
-texture = ExtResource("13_y3oq7")
-
-[node name="shadarrow" type="Sprite2D" parent="." unique_id=857661071]
-modulate = Color(0, 0, 0, 1)
-position = Vector2(580, 200)
-scale = Vector2(0.185052, 0.258696)
-texture = ExtResource("13_y3oq7")
-
-[node name="puncher" type="Sprite2D" parent="." unique_id=586820618]
+[node name="puncher" type="AnimatedSprite2D" parent="." unique_id=1500218699]
 position = Vector2(568.594, 509.715)
 scale = Vector2(0.824207, 0.824207)
-texture = ExtResource("2_hck8m")
-region_enabled = true
-region_rect = Rect2(57, 305, 331, 388)
+sprite_frames = SubResource("SpriteFrames_ssvqc")
+animation = &"right"
+autoplay = "default"
 
 [node name="blackbar1" type="Sprite2D" parent="." unique_id=1339569625]
 modulate = Color(0, 0, 0, 1)
-position = Vector2(1.00009, 316)
-scale = Vector2(0.220313, 1.29167)
+position = Vector2(591, 817)
+rotation = -1.5707941
+scale = Vector2(0.23607697, 1.7954264)
 texture = ExtResource("2_02i57")
 
 [node name="blackbar2" type="Sprite2D" parent="." unique_id=1267789995]
 modulate = Color(0, 0, 0, 1)
-position = Vector2(1160.25, 299.5)
-scale = Vector2(0.230859, 1.17361)
+position = Vector2(593.00006, -165)
+rotation = -1.5707941
+scale = Vector2(0.2459108, 1.8581592)
 texture = ExtResource("2_02i57")
 
 [node name="waiter" type="Timer" parent="." unique_id=446449501]
@@ -243,12 +235,9 @@ scale = Vector2(1.41109, 1.41109)
 texture = ExtResource("12_cfp5y")
 
 [node name="switch" type="Sprite2D" parent="." unique_id=592712454]
+visible = false
 position = Vector2(599, 291)
 scale = Vector2(0.57374626, 0.5737463)
 texture = ExtResource("14_trtic")
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="switch" unique_id=184106289]
-root_node = NodePath("../..")
-libraries/ = SubResource("AnimationLibrary_ca42v")
 
 [connection signal="timeout" from="waiter" to="." method="_on_waiter_timeout"]
