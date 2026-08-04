@@ -2,13 +2,14 @@
 
 [ext_resource type="Script" uid="uid://b85ajcdgycc5n" path="res://scripts/game.gd" id="1_dfpl8"]
 [ext_resource type="Texture2D" uid="uid://dimke74rxsota" path="res://sprites/floor.png" id="2_02i57"]
-[ext_resource type="Texture2D" uid="uid://1d566jtgexy3" path="res://sprites/shaod.png" id="2_mwa01"]
 [ext_resource type="Texture2D" uid="uid://clb5fx5al2tp6" path="res://sprites/youwin.png" id="3_6clqb"]
 [ext_resource type="Texture2D" uid="uid://cpvcto1dehhba" path="res://sprites/bricks.png" id="4_ca42v"]
 [ext_resource type="Texture2D" uid="uid://beyvnnw8hpewc" path="res://sprites/life.png" id="6_qejtg"]
 [ext_resource type="Texture2D" uid="uid://buvwrkjsdlnfc" path="res://sprites/crack1.png" id="7_bob2h"]
 [ext_resource type="Texture2D" uid="uid://c7tx8m2ydg8hh" path="res://sprites/crack2.png" id="8_fx1v0"]
+[ext_resource type="Texture2D" uid="uid://dq8ib4eiatdeg" path="res://sprites/shadidle.png" id="8_rysoc"]
 [ext_resource type="Texture2D" uid="uid://cbe2yisg1h5pn" path="res://sprites/crack3.png" id="9_7irkr"]
+[ext_resource type="Texture2D" uid="uid://77c6de74fcsx" path="res://sprites/shadup.png" id="9_ssvqc"]
 [ext_resource type="Texture2D" uid="uid://bewem67bgpiro" path="res://sprites/idle.png" id="10_trtic"]
 [ext_resource type="Texture2D" uid="uid://dup0nwg5knqrw" path="res://sprites/shmile.png" id="11_qbotp"]
 [ext_resource type="Texture2D" uid="uid://cgxv7i57as7x8" path="res://sprites/down.png" id="11_rysoc"]
@@ -22,22 +23,84 @@
 atlas = ExtResource("4_ca42v")
 region = Rect2(0, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_qouja"]
-atlas = ExtResource("4_ca42v")
-region = Rect2(0, 32, 32, 32)
-
 [sub_resource type="SpriteFrames" id="SpriteFrames_wljb1"]
 animations = [{
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_rysoc")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_qouja")
 }],
 "loop": true,
 "name": &"default",
-"speed": 2.0
+"speed": 0.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_05nbr"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0sl42"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oaba0"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(0, 128, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_458eo"]
+atlas = ExtResource("9_ssvqc")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h3rex"]
+atlas = ExtResource("9_ssvqc")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fedci"]
+atlas = ExtResource("9_ssvqc")
+region = Rect2(0, 128, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8qswn"]
+atlas = ExtResource("9_ssvqc")
+region = Rect2(128, 128, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rm0al"]
+atlas = ExtResource("9_ssvqc")
+region = Rect2(0, 256, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_458eo"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_05nbr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0sl42")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oaba0")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_458eo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h3rex")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fedci")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8qswn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rm0al")
+}],
+"loop": true,
+"name": &"up",
+"speed": 7.0
 }]
 
 [sub_resource type="Curve" id="Curve_vcsiq"]
@@ -115,6 +178,10 @@ region = Rect2(0, 64, 64, 64)
 [sub_resource type="AtlasTexture" id="AtlasTexture_pl11u"]
 atlas = ExtResource("12_ca42v")
 region = Rect2(64, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_right5"]
+atlas = ExtResource("12_ca42v")
+region = Rect2(0, 128, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bhx41"]
 atlas = ExtResource("13_rysoc")
@@ -207,6 +274,9 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_pl11u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_right5")
 }],
 "loop": true,
 "name": &"right",
@@ -233,6 +303,28 @@ animations = [{
 "speed": 7.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_qouja"]
+atlas = ExtResource("14_trtic")
+region = Rect2(0, 0, 172, 172)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pr1ej"]
+atlas = ExtResource("14_trtic")
+region = Rect2(0, 172, 172, 172)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_05nbr"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qouja")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pr1ej")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
 [node name="game" type="Node2D" unique_id=1041176778]
 script = ExtResource("1_dfpl8")
 
@@ -256,6 +348,24 @@ texture = ExtResource("3_6clqb")
 modulate = Color(0.776471, 0.607843, 0.678431, 1)
 position = Vector2(286, 159)
 scale = Vector2(14.27015, 14.6408825)
+sprite_frames = SubResource("SpriteFrames_wljb1")
+autoplay = "default"
+frame_progress = 0.928823
+
+[node name="WallTileLeft" type="AnimatedSprite2D" parent="Wall" unique_id=2062302869]
+position = Vector2(-32, 0)
+sprite_frames = SubResource("SpriteFrames_wljb1")
+autoplay = "default"
+frame_progress = 0.928823
+
+[node name="WallTileRight1" type="AnimatedSprite2D" parent="Wall" unique_id=2062302870]
+position = Vector2(32, 0)
+sprite_frames = SubResource("SpriteFrames_wljb1")
+autoplay = "default"
+frame_progress = 0.928823
+
+[node name="WallTileRight2" type="AnimatedSprite2D" parent="Wall" unique_id=2062302871]
+position = Vector2(64, 0)
 sprite_frames = SubResource("SpriteFrames_wljb1")
 autoplay = "default"
 frame_progress = 0.928823
@@ -300,12 +410,14 @@ position = Vector2(581, 394.328)
 scale = Vector2(0.808203, 0.018533)
 texture = ExtResource("2_02i57")
 
-[node name="shadow" type="Sprite2D" parent="." unique_id=378788722]
-position = Vector2(592, 320)
-scale = Vector2(0.488233, 0.488233)
-texture = ExtResource("2_mwa01")
-region_enabled = true
-region_rect = Rect2(100, 122, 372, 1061)
+[node name="shadow" type="AnimatedSprite2D" parent="." unique_id=826273536]
+texture_filter = 1
+position = Vector2(550, 297)
+scale = Vector2(5, 5)
+sprite_frames = SubResource("SpriteFrames_458eo")
+animation = &"up"
+autoplay = "default"
+frame_progress = 0.5995899
 
 [node name="wallpart" type="CPUParticles2D" parent="." unique_id=1588674007]
 position = Vector2(811, 269)
@@ -333,9 +445,7 @@ texture_filter = 1
 position = Vector2(582.00006, 178.00003)
 scale = Vector2(13, 13)
 sprite_frames = SubResource("SpriteFrames_ssvqc")
-animation = &"up"
 autoplay = "default"
-frame_progress = 0.013246408
 
 [node name="blackbar1" type="Sprite2D" parent="." unique_id=1339569625]
 modulate = Color(0, 0, 0, 1)
@@ -363,11 +473,13 @@ position = Vector2(581, 323)
 scale = Vector2(1.41109, 1.41109)
 texture = ExtResource("12_cfp5y")
 
-[node name="switch" type="Sprite2D" parent="." unique_id=592712454]
+[node name="switch" type="AnimatedSprite2D" parent="." unique_id=1962884118]
 visible = false
 position = Vector2(599, 291)
 scale = Vector2(0.57374626, 0.5737463)
-texture = ExtResource("14_trtic")
+sprite_frames = SubResource("SpriteFrames_05nbr")
+autoplay = "default"
+frame_progress = 0.9901181
 
 [node name="camera" type="Camera2D" parent="." unique_id=435443674]
 position = Vector2(580.085, 324)

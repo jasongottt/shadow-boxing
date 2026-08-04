@@ -29,71 +29,91 @@ const ALL_DIRECTIONS: Array[int] = [
 
 const PUNCHER_IDLE_ANIMATION := &"default"
 
-## An AnimatedSprite2D has a single scale shared by every animation, but the
-## puncher's sheets have different frame sizes (idle 32px, up 48px, right 64px),
-## so scale and position are re-applied on each animation change.
+## An AnimatedSprite2D has a single scale shared by every animation. All five
+## puncher sheets (idle, up, right, left, down) share the same 64px frame size,
+## so scale and position are identical across every animation.
 ##
 ## The pixel-art sheets are all authored at the same texel scale -- the neutral
-## stance is 22x21 texels in idle, right AND up -- so they share one integer
+## stance is ~20-22x21-22 texels in every sheet -- so they share one integer
 ## PIXEL_SCALE. Every frame is bottom-anchored (feet flush with the frame's
-## bottom edge) and centred 1 texel left of the frame centre, which is what
+## bottom edge) and centred ~1 texel left of the frame centre, which is what
 ## PUNCHER_FEET_Y / PUNCHER_CENTER_X below are measured against.
 const PIXEL_SCALE := 13.0
+const PUNCHER_FRAME_SIZE := 64.0
 const PUNCHER_FEET_Y := 585.0
 const PUNCHER_CENTER_X := 568.594
 
-## Scale and position per animation. Pixel-art entries are derived from
-## PIXEL_SCALE: position.y = PUNCHER_FEET_Y - (frame_size / 2) * PIXEL_SCALE, so
-## every pose plants its feet on the same line, and position.x offsets by one
-## texel to cancel the sheets' 1-texel centring bias.
-##
-## "left" and "down" are still hand-drawn guy.png placeholders. Their scales are
-## chosen so the figure matches the pixel-art figure's height (~273px) instead of
-## dwarfing it, and their positions account for the dead space under their feet.
-## Replace both rows with PIXEL_SCALE entries once those sheets are redrawn.
+## Scale and position per animation, derived from PIXEL_SCALE:
+## position.y = PUNCHER_FEET_Y - (frame_size / 2) * PIXEL_SCALE, so every pose
+## plants its feet on the same line, and position.x offsets by one texel to
+## cancel the sheets' 1-texel centring bias. All sheets share the same frame
+## size, so every pose ends up with the same scale/position.
+const PUNCHER_POSE_POSITION := Vector2(
+	PUNCHER_CENTER_X + PIXEL_SCALE, PUNCHER_FEET_Y - (PUNCHER_FRAME_SIZE / 2.0) * PIXEL_SCALE
+)
 const PUNCHER_POSES := {
-	&"default": {"scale": PIXEL_SCALE, "position": Vector2(581.594, 377.0)},
-	&"up": {"scale": PIXEL_SCALE, "position": Vector2(581.594, 273.0)},
-	&"right": {"scale": PIXEL_SCALE, "position": Vector2(581.594, 169.0)},
-	&"left": {"scale": 0.472, "position": Vector2(570.954, 428.8)},
-	&"down": {"scale": 0.600, "position": Vector2(583.594, 415.2)},
+	&"default": {"scale": PIXEL_SCALE, "position": PUNCHER_POSE_POSITION},
+	&"up": {"scale": PIXEL_SCALE, "position": PUNCHER_POSE_POSITION},
+	&"right": {"scale": PIXEL_SCALE, "position": PUNCHER_POSE_POSITION},
+	&"left": {"scale": PIXEL_SCALE, "position": PUNCHER_POSE_POSITION},
+	&"down": {"scale": PIXEL_SCALE, "position": PUNCHER_POSE_POSITION},
 }
-const SHADOW_DEFAULT_POSITION := Vector2(540, 344)
-const SHADOW_DEFAULT_SCALE := Vector2(0.534, 0.534)
-const SHADOW_DEFAULT_REGION := Rect2(100, 122, 372, 1061)
+const SHADOW_IDLE_ANIMATION := &"default"
+
+## The shadow sheets (shadidle.png, shadup.png) are 128x128 pixel-art frames.
+## Every frame is bottom-anchored -- the silhouette's feet sit on the frame's
+## bottom edge -- and centred 2 texels left of the frame centre, so all poses
+## share one anchor and swapping animations never shifts the figure.
+const SHADOW_FRAME_SIZE := 128.0
+const SHADOW_SILHOUETTE_CENTER_X := 62.0
+
+## The idle silhouette is 78 texels tall, the up-dodge leap 105. The playfield is
+## letterboxed to roughly y 33..615 by the black bars, so the scale is driven by
+## the tallest pose: 105 texels must fit in those ~582px. Scale 5 keeps the whole
+## leap on screen (peaking at y 92, right where the up-punch crack lands) and is
+## an integer, so pixels stay square under nearest-neighbour filtering exactly
+## like the puncher's PIXEL_SCALE.
+const SHADOW_PIXEL_SCALE := 5.0
+
+## Poses are authored as the point the silhouette's feet stand on; this offset
+## converts that into the node position, which is the centre of the frame.
+const SHADOW_ANCHOR_OFFSET := Vector2(
+	(SHADOW_FRAME_SIZE / 2.0 - SHADOW_SILHOUETTE_CENTER_X) * SHADOW_PIXEL_SCALE,
+	-(SHADOW_FRAME_SIZE / 2.0) * SHADOW_PIXEL_SCALE
+)
+const SHADOW_DEFAULT_FEET := Vector2(540, 617)
+const SHADOW_DEFAULT_POSITION := SHADOW_DEFAULT_FEET + SHADOW_ANCHOR_OFFSET
+const SHADOW_DEFAULT_SCALE := Vector2(SHADOW_PIXEL_SCALE, SHADOW_PIXEL_SCALE)
 
 ## Everything that differs between the four punch directions, in one table.
 const DIRECTION_DATA := {
 	Direction.UP: {
 		"animation": &"up",
 		"particle_position": Vector2(613, 133),
-		"shadow_position": Vector2(576, 335),
-		"shadow_scale": Vector2(0.492, 0.492),
-		"shadow_region": Rect2(2281, 127, 777, 1326),
+		# The up sheet animates the leap itself, so the pose stays put.
+		"shadow_feet": SHADOW_DEFAULT_FEET,
+		"shadow_animation": &"up",
 		"crack_position": Vector2(576, 105),
 	},
 	Direction.DOWN: {
 		"animation": &"down",
 		"particle_position": Vector2(610, 350),
-		"shadow_position": Vector2(582, 499),
-		"shadow_scale": Vector2(0.488, 0.488),
-		"shadow_region": Rect2(2281, 127, 777, 1126),
+		"shadow_feet": Vector2(582, 737),
+		"shadow_animation": SHADOW_IDLE_ANIMATION,
 		"crack_position": Vector2(582, 299),
 	},
 	Direction.LEFT: {
 		"animation": &"left",
 		"particle_position": Vector2(322, 265),
-		"shadow_position": Vector2(331, 370),
-		"shadow_scale": SHADOW_DEFAULT_SCALE,
-		"shadow_region": Rect2(588, 140, 690, 1121),
+		"shadow_feet": Vector2(331, 617),
+		"shadow_animation": SHADOW_IDLE_ANIMATION,
 		"crack_position": Vector2(331, 250),
 	},
 	Direction.RIGHT: {
 		"animation": &"right",
 		"particle_position": Vector2(811, 269),
-		"shadow_position": Vector2(796, 360),
-		"shadow_scale": SHADOW_DEFAULT_SCALE,
-		"shadow_region": Rect2(1427, 149, 690, 1121),
+		"shadow_feet": Vector2(796, 617),
+		"shadow_animation": SHADOW_IDLE_ANIMATION,
 		"crack_position": Vector2(796, 250),
 	},
 }
@@ -174,8 +194,8 @@ const TURN_TIMER_BAR_SCRIPT := preload("res://scripts/turn_timer_bar.gd")
 	$cracks/Crack3,
 ]
 @onready var puncher: AnimatedSprite2D = $puncher
-@onready var shadow: Sprite2D = $shadow
-@onready var switch_sprite: Sprite2D = $switch
+@onready var shadow: AnimatedSprite2D = $shadow
+@onready var switch_sprite: AnimatedSprite2D = $switch
 @onready var wall_particles: CPUParticles2D = $wallpart
 @onready var top_bar: Sprite2D = $blackbar2
 @onready var bottom_bar: Sprite2D = $blackbar1
@@ -279,7 +299,9 @@ func process_input_phase(delta: float) -> void:
 func apply_idle_bob() -> void:
 	var bob := sin(idle_time * IDLE_BOB_SPEED) * IDLE_BOB_AMOUNT
 	puncher.position = get_puncher_base_position(puncher.animation) + Vector2(0.0, bob)
-	shadow.position = SHADOW_DEFAULT_POSITION + Vector2(0.0, bob * IDLE_SHADOW_BOB_RATIO)
+	shadow.position = get_shadow_node_position(
+		SHADOW_DEFAULT_FEET + Vector2(0.0, bob * IDLE_SHADOW_BOB_RATIO)
+	)
 
 
 func handle_turn_timeout() -> void:
@@ -509,9 +531,10 @@ func update_puncher_visuals(direction: Direction) -> void:
 
 
 func update_shadow_visuals(direction: Direction) -> void:
-	shadow.position = get_direction_value(direction, "shadow_position", SHADOW_DEFAULT_POSITION)
-	shadow.scale = get_direction_value(direction, "shadow_scale", SHADOW_DEFAULT_SCALE)
-	shadow.region_rect = get_direction_value(direction, "shadow_region", SHADOW_DEFAULT_REGION)
+	apply_shadow_pose(
+		get_direction_value(direction, "shadow_feet", SHADOW_DEFAULT_FEET),
+		get_direction_value(direction, "shadow_animation", SHADOW_IDLE_ANIMATION),
+	)
 
 
 func get_direction_value(direction: Direction, key: String, fallback: Variant) -> Variant:
@@ -627,10 +650,27 @@ func reset_puncher() -> void:
 	apply_puncher_pose(PUNCHER_IDLE_ANIMATION)
 
 
-func reset_shadow() -> void:
-	shadow.region_rect = SHADOW_DEFAULT_REGION
-	shadow.position = SHADOW_DEFAULT_POSITION
+## Converts the point the silhouette's feet stand on into the AnimatedSprite2D's
+## node position, which is the centre of the (mostly empty) 128x128 frame.
+func get_shadow_node_position(feet_position: Vector2) -> Vector2:
+	return feet_position + SHADOW_ANCHOR_OFFSET
+
+
+## Scale is constant across poses, and every sheet is anchored the same way, so
+## the shadow never jumps or resizes when the animation changes.
+func apply_shadow_pose(feet_position: Vector2, animation: StringName) -> void:
 	shadow.scale = SHADOW_DEFAULT_SCALE
+	shadow.position = get_shadow_node_position(feet_position)
+
+	# Restart so a dodge always plays from the first frame of its leap.
+	if shadow.animation != animation:
+		shadow.frame = 0
+
+	shadow.play(animation)
+
+
+func reset_shadow() -> void:
+	apply_shadow_pose(SHADOW_DEFAULT_FEET, SHADOW_IDLE_ANIMATION)
 
 
 func reset_cracks() -> void:
@@ -711,7 +751,7 @@ func play_switch_animation() -> void:
 	scale_tween.tween_property(
 		switch_sprite,
 		^"scale",
-		Vector2(0.674, 0.674),
+		Vector2(5.674, 5.674),
 		0.8,
 	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	scale_tween.tween_property(
