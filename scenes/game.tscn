@@ -46,39 +46,39 @@ point_count = 2
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ssvqc"]
 atlas = ExtResource("10_trtic")
-region = Rect2(0, 0, 32, 32)
+region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_264po"]
 atlas = ExtResource("10_trtic")
-region = Rect2(32, 0, 32, 32)
+region = Rect2(64, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1kice"]
 atlas = ExtResource("10_trtic")
-region = Rect2(0, 32, 32, 32)
+region = Rect2(0, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5newe"]
 atlas = ExtResource("10_trtic")
-region = Rect2(32, 32, 32, 32)
+region = Rect2(64, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_wljb1"]
 atlas = ExtResource("11_rysoc")
-region = Rect2(0, 0, 32, 32)
+region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_v2yb1"]
 atlas = ExtResource("11_rysoc")
-region = Rect2(32, 0, 32, 32)
+region = Rect2(64, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_js0lu"]
 atlas = ExtResource("11_rysoc")
-region = Rect2(0, 32, 32, 32)
+region = Rect2(0, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gxtfn"]
 atlas = ExtResource("11_rysoc")
-region = Rect2(32, 32, 32, 32)
+region = Rect2(64, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_twgab"]
 atlas = ExtResource("11_rysoc")
-region = Rect2(0, 64, 32, 32)
+region = Rect2(0, 128, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_02fa5"]
 atlas = ExtResource("12_ssvqc")
@@ -118,23 +118,23 @@ region = Rect2(64, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bhx41"]
 atlas = ExtResource("13_rysoc")
-region = Rect2(0, 0, 48, 48)
+region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qnb83"]
 atlas = ExtResource("13_rysoc")
-region = Rect2(48, 0, 48, 48)
+region = Rect2(64, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_sww3w"]
 atlas = ExtResource("13_rysoc")
-region = Rect2(0, 48, 48, 48)
+region = Rect2(0, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_suyxu"]
 atlas = ExtResource("13_rysoc")
-region = Rect2(48, 48, 48, 48)
+region = Rect2(64, 64, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_sgl2t"]
 atlas = ExtResource("13_rysoc")
-region = Rect2(0, 96, 48, 48)
+region = Rect2(0, 128, 64, 64)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ssvqc"]
 animations = [{
@@ -258,7 +258,7 @@ position = Vector2(286, 159)
 scale = Vector2(14.27015, 14.6408825)
 sprite_frames = SubResource("SpriteFrames_wljb1")
 autoplay = "default"
-frame_progress = 0.39459777
+frame_progress = 0.928823
 
 [node name="Crack4" type="Sprite2D" parent="." unique_id=903930941]
 modulate = Color(1, 1, 1, 0)
@@ -333,9 +333,9 @@ texture_filter = 1
 position = Vector2(582.00006, 178.00003)
 scale = Vector2(13, 13)
 sprite_frames = SubResource("SpriteFrames_ssvqc")
-animation = &"left"
+animation = &"up"
 autoplay = "default"
-frame_progress = 0.8711321
+frame_progress = 0.013246408
 
 [node name="blackbar1" type="Sprite2D" parent="." unique_id=1339569625]
 modulate = Color(0, 0, 0, 1)
