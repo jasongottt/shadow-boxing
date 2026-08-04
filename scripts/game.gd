@@ -27,9 +27,37 @@ const ALL_DIRECTIONS: Array[int] = [
 	Direction.RIGHT,
 ]
 
-const PUNCHER_DEFAULT_POSITION := Vector2(568.594, 479.715)
-const PUNCHER_LEFT_POSITION := Vector2(468.594, 509.715)
-const PUNCHER_RIGHT_POSITION := Vector2(668.594, 509.715)
+const PUNCHER_IDLE_ANIMATION := &"default"
+
+## An AnimatedSprite2D has a single scale shared by every animation, but the
+## puncher's sheets have different frame sizes (idle 32px, up 48px, right 64px),
+## so scale and position are re-applied on each animation change.
+##
+## The pixel-art sheets are all authored at the same texel scale -- the neutral
+## stance is 22x21 texels in idle, right AND up -- so they share one integer
+## PIXEL_SCALE. Every frame is bottom-anchored (feet flush with the frame's
+## bottom edge) and centred 1 texel left of the frame centre, which is what
+## PUNCHER_FEET_Y / PUNCHER_CENTER_X below are measured against.
+const PIXEL_SCALE := 13.0
+const PUNCHER_FEET_Y := 585.0
+const PUNCHER_CENTER_X := 568.594
+
+## Scale and position per animation. Pixel-art entries are derived from
+## PIXEL_SCALE: position.y = PUNCHER_FEET_Y - (frame_size / 2) * PIXEL_SCALE, so
+## every pose plants its feet on the same line, and position.x offsets by one
+## texel to cancel the sheets' 1-texel centring bias.
+##
+## "left" and "down" are still hand-drawn guy.png placeholders. Their scales are
+## chosen so the figure matches the pixel-art figure's height (~273px) instead of
+## dwarfing it, and their positions account for the dead space under their feet.
+## Replace both rows with PIXEL_SCALE entries once those sheets are redrawn.
+const PUNCHER_POSES := {
+	&"default": {"scale": PIXEL_SCALE, "position": Vector2(581.594, 377.0)},
+	&"up": {"scale": PIXEL_SCALE, "position": Vector2(581.594, 273.0)},
+	&"right": {"scale": PIXEL_SCALE, "position": Vector2(581.594, 169.0)},
+	&"left": {"scale": 0.472, "position": Vector2(570.954, 428.8)},
+	&"down": {"scale": 0.600, "position": Vector2(583.594, 415.2)},
+}
 const SHADOW_DEFAULT_POSITION := Vector2(540, 344)
 const SHADOW_DEFAULT_SCALE := Vector2(0.534, 0.534)
 const SHADOW_DEFAULT_REGION := Rect2(100, 122, 372, 1061)
@@ -38,7 +66,6 @@ const SHADOW_DEFAULT_REGION := Rect2(100, 122, 372, 1061)
 const DIRECTION_DATA := {
 	Direction.UP: {
 		"animation": &"up",
-		"puncher_position": PUNCHER_DEFAULT_POSITION,
 		"particle_position": Vector2(613, 133),
 		"shadow_position": Vector2(576, 335),
 		"shadow_scale": Vector2(0.492, 0.492),
@@ -47,7 +74,6 @@ const DIRECTION_DATA := {
 	},
 	Direction.DOWN: {
 		"animation": &"down",
-		"puncher_position": PUNCHER_DEFAULT_POSITION,
 		"particle_position": Vector2(610, 350),
 		"shadow_position": Vector2(582, 499),
 		"shadow_scale": Vector2(0.488, 0.488),
@@ -56,7 +82,6 @@ const DIRECTION_DATA := {
 	},
 	Direction.LEFT: {
 		"animation": &"left",
-		"puncher_position": PUNCHER_LEFT_POSITION,
 		"particle_position": Vector2(322, 265),
 		"shadow_position": Vector2(331, 370),
 		"shadow_scale": SHADOW_DEFAULT_SCALE,
@@ -65,7 +90,6 @@ const DIRECTION_DATA := {
 	},
 	Direction.RIGHT: {
 		"animation": &"right",
-		"puncher_position": PUNCHER_RIGHT_POSITION,
 		"particle_position": Vector2(811, 269),
 		"shadow_position": Vector2(796, 360),
 		"shadow_scale": SHADOW_DEFAULT_SCALE,
@@ -100,6 +124,13 @@ const REPLAY_LIVE_GAP := 0.2
 const CRACK_POP_SCALE := 1.45
 const CRACK_POP_DURATION := 0.16
 
+## The environment leans toward the attacking player's colour so whose turn it
+## is readable from the whole frame, not just the two fighters.
+const WALL_BASE_COLOR := Color(0.776, 0.607, 0.678, 1.0)
+const WALL_GRADE_STRENGTH := 0.3
+const FLOOR_GRADE_STRENGTH := 0.18
+const GRADE_TWEEN_DURATION := 0.5
+
 const IDLE_BOB_SPEED := 4.0
 const IDLE_BOB_AMOUNT := 4.0
 const IDLE_SHADOW_BOB_RATIO := -0.6
@@ -131,6 +162,12 @@ const TURN_TIMER_BAR_SCRIPT := preload("res://scripts/turn_timer_bar.gd")
 @export var shake_decay_rate: float = 5.0
 
 @onready var camera: Camera2D = $camera
+@onready var wall_sprite: Sprite2D = $Wall
+@onready var floor_sprites: Array[Sprite2D] = [
+	$Floor,
+	$Floor2,
+	$darkline,
+]
 @onready var crack_sprites: Array[Sprite2D] = [
 	$cracks/Crack1,
 	$cracks/Crack2,
@@ -174,6 +211,7 @@ func _ready() -> void:
 	reset_shadow()
 	set_player_color()
 	refresh_indicators()
+	apply_environment_grade(true)
 	timer_bar.set_state(1.0, get_player_color(), false)
 	animate_bars_in()
 
@@ -240,7 +278,7 @@ func process_input_phase(delta: float) -> void:
 ## Keeps the fighters breathing while the turn timer drains.
 func apply_idle_bob() -> void:
 	var bob := sin(idle_time * IDLE_BOB_SPEED) * IDLE_BOB_AMOUNT
-	puncher.position = PUNCHER_DEFAULT_POSITION + Vector2(0.0, bob)
+	puncher.position = get_puncher_base_position(puncher.animation) + Vector2(0.0, bob)
 	shadow.position = SHADOW_DEFAULT_POSITION + Vector2(0.0, bob * IDLE_SHADOW_BOB_RATIO)
 
 
@@ -337,6 +375,7 @@ func switch_player() -> void:
 	reset_round_state()
 	timer_bar.set_state(1.0, get_player_color(), false)
 	refresh_indicators()
+	apply_environment_grade()
 
 	await play_switch_animation()
 
@@ -460,10 +499,10 @@ func play_flash() -> void:
 
 
 func update_puncher_visuals(direction: Direction) -> void:
-	puncher.position = get_direction_value(
-		direction, "puncher_position", PUNCHER_DEFAULT_POSITION
+	var animation: StringName = get_direction_value(
+		direction, "animation", PUNCHER_IDLE_ANIMATION
 	)
-	puncher.play(get_direction_value(direction, "animation", &"default"))
+	apply_puncher_pose(animation)
 	wall_particles.position = get_direction_value(
 		direction, "particle_position", wall_particles.position
 	)
@@ -490,6 +529,34 @@ func refresh_indicators() -> void:
 			spent.append(direction)
 
 	indicators.set_state(spent, get_player_color())
+
+
+func get_wall_grade_color() -> Color:
+	return WALL_BASE_COLOR.lerp(get_attacker_color(), WALL_GRADE_STRENGTH)
+
+
+func get_floor_grade_color() -> Color:
+	return Color.WHITE.lerp(get_attacker_color(), FLOOR_GRADE_STRENGTH)
+
+
+func apply_environment_grade(instant: bool = false) -> void:
+	var wall_color := get_wall_grade_color()
+	var floor_color := get_floor_grade_color()
+
+	if instant:
+		wall_sprite.modulate = wall_color
+		for floor_sprite in floor_sprites:
+			floor_sprite.modulate = floor_color
+		return
+
+	var grade_tween := create_tween()
+	grade_tween.set_parallel(true)
+	grade_tween.tween_property(wall_sprite, ^"modulate", wall_color, GRADE_TWEEN_DURATION)
+
+	for floor_sprite in floor_sprites:
+		grade_tween.tween_property(
+			floor_sprite, ^"modulate", floor_color, GRADE_TWEEN_DURATION
+		)
 
 
 func refresh_lock_indicators() -> void:
@@ -536,9 +603,28 @@ func set_player_color(alpha: float = 1.0) -> void:
 	shadow.modulate = defender_color
 
 
+func is_idle_animation(animation: StringName) -> bool:
+	return animation == PUNCHER_IDLE_ANIMATION
+
+
+## The base position the puncher sits at for a given animation, which is also
+## the position the idle bob oscillates around.
+func get_puncher_base_position(animation: StringName) -> Vector2:
+	var pose: Dictionary = PUNCHER_POSES.get(animation, PUNCHER_POSES[PUNCHER_IDLE_ANIMATION])
+	return pose["position"]
+
+
+## Plays an animation on the puncher with the scale/position that animation needs.
+func apply_puncher_pose(animation: StringName) -> void:
+	var pose: Dictionary = PUNCHER_POSES.get(animation, PUNCHER_POSES[PUNCHER_IDLE_ANIMATION])
+	var pose_scale: float = pose["scale"]
+	puncher.scale = Vector2(pose_scale, pose_scale)
+	puncher.position = pose["position"]
+	puncher.play(animation)
+
+
 func reset_puncher() -> void:
-	puncher.play(&"default")
-	puncher.position = PUNCHER_DEFAULT_POSITION
+	apply_puncher_pose(PUNCHER_IDLE_ANIMATION)
 
 
 func reset_shadow() -> void:

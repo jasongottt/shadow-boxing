@@ -10,17 +10,32 @@
 [ext_resource type="Texture2D" uid="uid://buvwrkjsdlnfc" path="res://sprites/crack1.png" id="7_bob2h"]
 [ext_resource type="Texture2D" uid="uid://c7tx8m2ydg8hh" path="res://sprites/crack2.png" id="8_fx1v0"]
 [ext_resource type="Texture2D" uid="uid://cbe2yisg1h5pn" path="res://sprites/crack3.png" id="9_7irkr"]
+[ext_resource type="Texture2D" uid="uid://bewem67bgpiro" path="res://sprites/idle.png" id="10_trtic"]
 [ext_resource type="Texture2D" uid="uid://dup0nwg5knqrw" path="res://sprites/shmile.png" id="11_qbotp"]
+[ext_resource type="Texture2D" uid="uid://do0cu34kdgq2d" path="res://sprites/right.png" id="12_ca42v"]
 [ext_resource type="Texture2D" uid="uid://dl6epd0ddldfe" path="res://sprites/youlose.png" id="12_cfp5y"]
+[ext_resource type="Texture2D" uid="uid://do3n32e7nc0dw" path="res://sprites/up.png" id="13_rysoc"]
 [ext_resource type="Texture2D" uid="uid://0u5iwky8kddt" path="res://sprites/switch.png" id="14_trtic"]
 
 [sub_resource type="Curve" id="Curve_vcsiq"]
 _data = [Vector2(0, 1), 0.0, -0.0769558, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 2
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_kvuet"]
-atlas = ExtResource("2_hck8m")
-region = Rect2(0, 0, 421, 764)
+[sub_resource type="AtlasTexture" id="AtlasTexture_ssvqc"]
+atlas = ExtResource("10_trtic")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_264po"]
+atlas = ExtResource("10_trtic")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1kice"]
+atlas = ExtResource("10_trtic")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5newe"]
+atlas = ExtResource("10_trtic")
+region = Rect2(32, 32, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_trtic"]
 atlas = ExtResource("2_hck8m")
@@ -30,19 +45,56 @@ region = Rect2(2105, 0, 421, 764)
 atlas = ExtResource("2_hck8m")
 region = Rect2(1026, 0, 625, 764)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ir15t"]
-atlas = ExtResource("2_hck8m")
-region = Rect2(420, 0, 625, 764)
+[sub_resource type="AtlasTexture" id="AtlasTexture_37s47"]
+atlas = ExtResource("12_ca42v")
+region = Rect2(0, 0, 64, 64)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_rysoc"]
-atlas = ExtResource("2_hck8m")
-region = Rect2(1684, 0, 421, 764)
+[sub_resource type="AtlasTexture" id="AtlasTexture_bt5mj"]
+atlas = ExtResource("12_ca42v")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e1j6l"]
+atlas = ExtResource("12_ca42v")
+region = Rect2(0, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pl11u"]
+atlas = ExtResource("12_ca42v")
+region = Rect2(64, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bhx41"]
+atlas = ExtResource("13_rysoc")
+region = Rect2(0, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qnb83"]
+atlas = ExtResource("13_rysoc")
+region = Rect2(48, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sww3w"]
+atlas = ExtResource("13_rysoc")
+region = Rect2(0, 48, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_suyxu"]
+atlas = ExtResource("13_rysoc")
+region = Rect2(48, 48, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sgl2t"]
+atlas = ExtResource("13_rysoc")
+region = Rect2(0, 96, 48, 48)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ssvqc"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_kvuet")
+"texture": SubResource("AtlasTexture_ssvqc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_264po")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1kice")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5newe")
 }],
 "loop": true,
 "name": &"default",
@@ -66,7 +118,16 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ir15t")
+"texture": SubResource("AtlasTexture_37s47")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bt5mj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e1j6l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pl11u")
 }],
 "loop": true,
 "name": &"right",
@@ -74,11 +135,23 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_rysoc")
+"texture": SubResource("AtlasTexture_bhx41")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qnb83")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sww3w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_suyxu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sgl2t")
 }],
 "loop": true,
 "name": &"up",
-"speed": 5.0
+"speed": 7.0
 }]
 
 [node name="game" type="Node2D" unique_id=1041176778]
@@ -177,11 +250,13 @@ scale_amount_curve = SubResource("Curve_vcsiq")
 color = Color(0.576471, 0.270588, 0.27451, 1)
 
 [node name="puncher" type="AnimatedSprite2D" parent="." unique_id=1500218699]
-position = Vector2(568.594, 509.715)
-scale = Vector2(0.824207, 0.824207)
+texture_filter = 1
+position = Vector2(582.00006, 178.00003)
+scale = Vector2(13, 13)
 sprite_frames = SubResource("SpriteFrames_ssvqc")
 animation = &"right"
 autoplay = "default"
+frame_progress = 0.5087506
 
 [node name="blackbar1" type="Sprite2D" parent="." unique_id=1339569625]
 modulate = Color(0, 0, 0, 1)
