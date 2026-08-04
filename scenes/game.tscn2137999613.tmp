@@ -83,6 +83,10 @@ animations = [{
 
 [node name="game" type="Node2D" unique_id=1041176778]
 script = ExtResource("1_dfpl8")
+player_one_color = null
+player_two_color = null
+max_shake_strength = null
+shake_decay_rate = null
 
 [node name="Floor" type="Sprite2D" parent="." unique_id=259247632]
 position = Vector2(589.25, 343.5)
