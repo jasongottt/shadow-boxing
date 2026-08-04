@@ -1,3 +1,4 @@
+class_name Game
 extends Node2D
 
 enum Direction {
@@ -8,13 +9,23 @@ enum Direction {
 	RIGHT,
 }
 
+enum State {
+	INTRO,
+	INPUT,
+	REPLAY,
+	SWITCHING,
+	WALL_BREAK,
+}
+
 const PLAYER_ONE := 1
 const PLAYER_TWO := 2
 const MAX_HITS := 3
-const MAX_TRIES := 3
-const INPUT_FLASH_DURATION := 0.05
-const WALL_BREAK_DELAY := 1.0
-const SWITCH_FLASH_COUNT := 6
+const ALL_DIRECTIONS: Array[int] = [
+	Direction.UP,
+	Direction.DOWN,
+	Direction.LEFT,
+	Direction.RIGHT,
+]
 
 const PUNCHER_DEFAULT_POSITION := Vector2(568.594, 479.715)
 const PUNCHER_LEFT_POSITION := Vector2(468.594, 509.715)
@@ -22,13 +33,97 @@ const PUNCHER_RIGHT_POSITION := Vector2(668.594, 509.715)
 const SHADOW_DEFAULT_POSITION := Vector2(540, 344)
 const SHADOW_DEFAULT_SCALE := Vector2(0.534, 0.534)
 const SHADOW_DEFAULT_REGION := Rect2(100, 122, 372, 1061)
-const LIFE_SCALE := Vector2(0.119, 0.119)
+
+## Everything that differs between the four punch directions, in one table.
+const DIRECTION_DATA := {
+	Direction.UP: {
+		"animation": &"up",
+		"puncher_position": PUNCHER_DEFAULT_POSITION,
+		"particle_position": Vector2(613, 133),
+		"shadow_position": Vector2(576, 335),
+		"shadow_scale": Vector2(0.492, 0.492),
+		"shadow_region": Rect2(2281, 127, 777, 1326),
+		"crack_position": Vector2(576, 105),
+	},
+	Direction.DOWN: {
+		"animation": &"down",
+		"puncher_position": PUNCHER_DEFAULT_POSITION,
+		"particle_position": Vector2(610, 350),
+		"shadow_position": Vector2(582, 499),
+		"shadow_scale": Vector2(0.488, 0.488),
+		"shadow_region": Rect2(2281, 127, 777, 1126),
+		"crack_position": Vector2(582, 299),
+	},
+	Direction.LEFT: {
+		"animation": &"left",
+		"puncher_position": PUNCHER_LEFT_POSITION,
+		"particle_position": Vector2(322, 265),
+		"shadow_position": Vector2(331, 370),
+		"shadow_scale": SHADOW_DEFAULT_SCALE,
+		"shadow_region": Rect2(588, 140, 690, 1121),
+		"crack_position": Vector2(331, 250),
+	},
+	Direction.RIGHT: {
+		"animation": &"right",
+		"puncher_position": PUNCHER_RIGHT_POSITION,
+		"particle_position": Vector2(811, 269),
+		"shadow_position": Vector2(796, 360),
+		"shadow_scale": SHADOW_DEFAULT_SCALE,
+		"shadow_region": Rect2(1427, 149, 690, 1121),
+		"crack_position": Vector2(796, 250),
+	},
+}
+
+const ARROW_ACTIONS := {
+	&"up": Direction.UP,
+	&"down": Direction.DOWN,
+	&"left": Direction.LEFT,
+	&"right": Direction.RIGHT,
+}
+const WASD_ACTIONS := {
+	&"w": Direction.UP,
+	&"s": Direction.DOWN,
+	&"a": Direction.LEFT,
+	&"d": Direction.RIGHT,
+}
+
+const TURN_TIME := 3.0
+const TIMEOUT_PAUSE := 0.5
+
+const SEQUENCE_START_DELAY := 0.3
+const REPLAY_GHOST_DURATION := 0.14
+const REPLAY_GHOST_GAP := 0.05
+const REPLAY_GHOST_ALPHA := 0.4
+const REPLAY_LIVE_DURATION := 0.45
+const REPLAY_LIVE_GAP := 0.2
+
+const CRACK_POP_SCALE := 1.45
+const CRACK_POP_DURATION := 0.16
+
+const IDLE_BOB_SPEED := 4.0
+const IDLE_BOB_AMOUNT := 4.0
+const IDLE_SHADOW_BOB_RATIO := -0.6
+
+const INPUT_FLASH_DURATION := 0.05
+const HIT_STOP_DURATION := 0.09
+const HIT_STOP_TIME_SCALE := 0.05
+const HIT_SHAKE_STRENGTH := 30.0
+const MISS_SHAKE_STRENGTH := 7.0
+const FLASH_ALPHA := 0.5
+const FLASH_FADE_DURATION := 0.22
+
+const WALL_BREAK_DELAY := 1.0
+const SWITCH_FLASH_COUNT := 6
 const BAR_SLIDE_DURATION := 1.0
 const BAR_SLIDE_STAGGER := 0.12
 const INTRO_ZOOM := 2.2
-
 const TOP_BAR_TARGET_POSITION := Vector2(593, -143)
 const BOTTOM_BAR_TARGET_POSITION := Vector2(591, 791)
+
+const INDICATORS_POSITION := Vector2(576, 664)
+const TIMER_BAR_POSITION := Vector2(576, 728)
+const DIRECTION_INDICATORS_SCRIPT := preload("res://scripts/direction_indicators.gd")
+const TURN_TIMER_BAR_SCRIPT := preload("res://scripts/turn_timer_bar.gd")
 
 @export var player_one_color := Color(0.825, 0.332, 0.387, 1.0)
 @export var player_two_color := Color(0.319, 0.533, 0.769, 1.0)
@@ -41,70 +136,450 @@ const BOTTOM_BAR_TARGET_POSITION := Vector2(591, 791)
 	$cracks/Crack2,
 	$cracks/Crack3,
 ]
-@onready var life_sprites: Array[Sprite2D] = [
-	$lives/life0,
-	$lives/life1,
-	$lives/life2,
-]
 @onready var puncher: AnimatedSprite2D = $puncher
 @onready var shadow: Sprite2D = $shadow
 @onready var switch_sprite: Sprite2D = $switch
-@onready var waiter: Timer = $waiter
 @onready var wall_particles: CPUParticles2D = $wallpart
 @onready var top_bar: Sprite2D = $blackbar2
 @onready var bottom_bar: Sprite2D = $blackbar1
+var indicators: DirectionIndicators
+var timer_bar: TurnTimerBar
+var flash_rect: ColorRect
 
+var state := State.INTRO
+## The attacker (current_player) drives the puncher, the other player the shadow.
 var current_player := PLAYER_ONE
-var arrow_direction := Direction.NONE
-var wasd_direction := Direction.NONE
+var punch_direction := Direction.NONE
+var dodge_direction := Direction.NONE
 var hits := 0
-var remaining_tries := MAX_TRIES
-var is_switching_players := false
-var is_wall_breaking := false
-var is_intro_playing := true
+var available_directions: Array[int] = []
+var punch_history: Array[Dictionary] = []
+var switch_after_sequence := false
+var turn_time_left := TURN_TIME
+var idle_time := 0.0
+var crack_base_scales: Array[Vector2] = []
 var shake_strength := 0.0
 var random := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
 	random.randomize()
+	build_hud()
+
+	for crack in crack_sprites:
+		crack_base_scales.append(crack.scale)
+
+	reset_round_state()
 	reset_puncher()
 	reset_shadow()
 	set_player_color()
+	refresh_indicators()
+	timer_bar.set_state(1.0, get_player_color(), false)
 	animate_bars_in()
 
 
 func _process(delta: float) -> void:
 	update_camera_shake(delta)
-	update_lives(delta)
 
-	if is_intro_playing or is_switching_players or is_wall_breaking:
+	if state == State.INPUT:
+		process_input_phase(delta)
+
+
+## The HUD is built in code so the scene file stays free of UI plumbing.
+func build_hud() -> void:
+	indicators = DIRECTION_INDICATORS_SCRIPT.new()
+	indicators.name = &"indicators"
+	indicators.position = INDICATORS_POSITION
+	add_child(indicators)
+
+	timer_bar = TURN_TIMER_BAR_SCRIPT.new()
+	timer_bar.name = &"timerbar"
+	timer_bar.position = TIMER_BAR_POSITION
+	add_child(timer_bar)
+
+	var flash_layer := CanvasLayer.new()
+	flash_layer.name = &"flash"
+	add_child(flash_layer)
+
+	flash_rect = ColorRect.new()
+	flash_rect.name = &"rect"
+	flash_rect.color = Color.WHITE
+	flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flash_layer.add_child(flash_rect)
+	flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	flash_rect.modulate.a = 0.0
+
+
+#region Turn flow
+func begin_input_phase() -> void:
+	clear_directions()
+	turn_time_left = TURN_TIME
+	idle_time = 0.0
+	refresh_indicators()
+	refresh_lock_indicators()
+	state = State.INPUT
+
+
+func process_input_phase(delta: float) -> void:
+	turn_time_left -= delta
+	idle_time += delta
+	timer_bar.set_state(turn_time_left / TURN_TIME, get_player_color(), true)
+	apply_idle_bob()
+
+	if turn_time_left <= 0.0:
+		handle_turn_timeout()
 		return
 
-	if remaining_tries <= 0:
-		switch_player()
-		return
+	handle_player_inputs()
+	refresh_lock_indicators()
+
+	if punch_direction != Direction.NONE and dodge_direction != Direction.NONE:
+		resolve_exchange()
+
+
+## Keeps the fighters breathing while the turn timer drains.
+func apply_idle_bob() -> void:
+	var bob := sin(idle_time * IDLE_BOB_SPEED) * IDLE_BOB_AMOUNT
+	puncher.position = PUNCHER_DEFAULT_POSITION + Vector2(0.0, bob)
+	shadow.position = SHADOW_DEFAULT_POSITION + Vector2(0.0, bob * IDLE_SHADOW_BOB_RATIO)
+
+
+func handle_turn_timeout() -> void:
+	# Hesitating costs the turn outright.
+	state = State.SWITCHING
+	timer_bar.set_state(0.0, get_player_color(), true)
+	apply_shake(MISS_SHAKE_STRENGTH)
+	clear_directions()
+
+	await get_tree().create_timer(TIMEOUT_PAUSE).timeout
+
+	switch_player()
+
+
+func resolve_exchange() -> void:
+	var punch := {
+		"punch": punch_direction,
+		"dodge": dodge_direction,
+		"hit": punch_direction == dodge_direction,
+		"attacker": current_player,
+	}
+	punch_history.append(punch)
+
+	if punch["hit"]:
+		hits += 1
+		available_directions.erase(int(punch["punch"]))
+	else:
+		# A miss ends this attacker's turn: the other player takes over.
+		switch_after_sequence = true
+
+	clear_directions()
+	refresh_lock_indicators()
+	play_punch_sequence()
+
+
+func play_punch_sequence() -> void:
+	state = State.REPLAY
+	timer_bar.set_state(0.0, get_player_color(), false)
+
+	reset_cracks()
+	reset_puncher()
+	reset_shadow()
+
+	await get_tree().create_timer(SEQUENCE_START_DELAY).timeout
+
+	var shown_hits := 0
+	var last_index := punch_history.size() - 1
+
+	for index in range(punch_history.size()):
+		var punch: Dictionary = punch_history[index]
+		var is_newest := index == last_index
+
+		show_punch(punch, is_newest)
+
+		await get_tree().create_timer(
+			REPLAY_LIVE_DURATION if is_newest else REPLAY_GHOST_DURATION
+		).timeout
+
+		if punch["hit"]:
+			play_hit_feedback(punch, shown_hits, is_newest)
+			shown_hits += 1
+		elif is_newest:
+			apply_shake(MISS_SHAKE_STRENGTH)
+
+		if is_newest:
+			# Unscaled so the freeze-frame doesn't stretch with Engine.time_scale.
+			await get_tree().create_timer(HIT_STOP_DURATION, true, false, true).timeout
+
+		reset_puncher()
+		reset_shadow()
+
+		await get_tree().create_timer(
+			REPLAY_LIVE_GAP if is_newest else REPLAY_GHOST_GAP
+		).timeout
+
+	clear_directions()
+	set_player_color()
 
 	if hits >= MAX_HITS:
 		break_wall()
+	elif switch_after_sequence:
+		switch_after_sequence = false
+		switch_player()
+	else:
+		begin_input_phase()
+
+
+func switch_player() -> void:
+	state = State.SWITCHING
+	current_player = PLAYER_TWO if current_player == PLAYER_ONE else PLAYER_ONE
+	hits = 0
+	switch_after_sequence = false
+	reset_round_state()
+	timer_bar.set_state(1.0, get_player_color(), false)
+	refresh_indicators()
+
+	await play_switch_animation()
+
+	reset_puncher()
+	reset_shadow()
+	reset_cracks()
+	set_player_color()
+	begin_input_phase()
+
+
+func reset_round_state() -> void:
+	available_directions = ALL_DIRECTIONS.duplicate()
+	punch_history.clear()
+	clear_directions()
+
+
+func clear_directions() -> void:
+	punch_direction = Direction.NONE
+	dodge_direction = Direction.NONE
+#endregion
+
+
+#region Input
+func handle_player_inputs() -> void:
+	if punch_direction == Direction.NONE:
+		var direction := get_pressed_direction(get_attacker_actions())
+		if direction != Direction.NONE:
+			punch_direction = direction
+			flash_puncher()
+
+	if dodge_direction == Direction.NONE:
+		var direction := get_pressed_direction(get_defender_actions())
+		if direction != Direction.NONE:
+			dodge_direction = direction
+			flash_shadow()
+
+
+## Player one attacks with the arrow keys, player two with WASD.
+func get_attacker_actions() -> Dictionary:
+	return ARROW_ACTIONS if current_player == PLAYER_ONE else WASD_ACTIONS
+
+
+func get_defender_actions() -> Dictionary:
+	return WASD_ACTIONS if current_player == PLAYER_ONE else ARROW_ACTIONS
+
+
+func get_pressed_direction(actions: Dictionary) -> Direction:
+	for action: StringName in actions.keys():
+		if not Input.is_action_just_pressed(action):
+			continue
+
+		var direction: Direction = actions[action]
+
+		# Directions that already landed a hit are spent and cannot be reused.
+		if available_directions.has(int(direction)):
+			return direction
+
+	return Direction.NONE
+#endregion
+
+
+#region Presentation
+func show_punch(punch: Dictionary, is_newest: bool) -> void:
+	var alpha := 1.0 if is_newest else REPLAY_GHOST_ALPHA
+	set_player_color(alpha)
+	update_puncher_visuals(punch["punch"])
+	update_shadow_visuals(punch["dodge"])
+
+
+func play_hit_feedback(punch: Dictionary, crack_index: int, is_newest: bool) -> void:
+	if crack_index < crack_sprites.size():
+		show_crack(crack_index, punch["dodge"], is_newest)
+
+	if not is_newest:
+		apply_shake(MISS_SHAKE_STRENGTH)
 		return
 
-	if waiter.is_stopped():
-		handle_player_inputs()
+	# Only a landed punch chips the wall, and only as it happens live.
+	wall_particles.restart()
+	refresh_indicators()
+	apply_shake(HIT_SHAKE_STRENGTH)
+	play_flash()
+	play_hit_stop()
 
-		if arrow_direction != Direction.NONE and wasd_direction != Direction.NONE:
-			start_attack()
+
+func show_crack(crack_index: int, direction: Direction, is_newest: bool) -> void:
+	var crack: Sprite2D = crack_sprites[crack_index]
+	var base_scale: Vector2 = crack_base_scales[crack_index]
+	crack.position = get_direction_value(direction, "crack_position", Vector2.ZERO)
+	crack.scale = base_scale
+	crack.show()
+
+	if not is_newest:
+		return
+
+	crack.scale = base_scale * CRACK_POP_SCALE
+
+	var pop_tween := create_tween()
+	# Ignore time scale so the pop plays through the hit-stop instead of crawling.
+	pop_tween.set_ignore_time_scale(true)
+	pop_tween.tween_property(
+		crack,
+		^"scale",
+		base_scale,
+		CRACK_POP_DURATION,
+	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
+func play_hit_stop() -> void:
+	Engine.time_scale = HIT_STOP_TIME_SCALE
+	# Ignore time scale so the freeze lasts a fixed amount of real time.
+	await get_tree().create_timer(HIT_STOP_DURATION, true, false, true).timeout
+	Engine.time_scale = 1.0
+
+
+func play_flash() -> void:
+	flash_rect.modulate.a = FLASH_ALPHA
+
+	var flash_tween := create_tween()
+	flash_tween.tween_property(flash_rect, ^"modulate:a", 0.0, FLASH_FADE_DURATION)
+
+
+func update_puncher_visuals(direction: Direction) -> void:
+	puncher.position = get_direction_value(
+		direction, "puncher_position", PUNCHER_DEFAULT_POSITION
+	)
+	puncher.play(get_direction_value(direction, "animation", &"default"))
+	wall_particles.position = get_direction_value(
+		direction, "particle_position", wall_particles.position
+	)
+
+
+func update_shadow_visuals(direction: Direction) -> void:
+	shadow.position = get_direction_value(direction, "shadow_position", SHADOW_DEFAULT_POSITION)
+	shadow.scale = get_direction_value(direction, "shadow_scale", SHADOW_DEFAULT_SCALE)
+	shadow.region_rect = get_direction_value(direction, "shadow_region", SHADOW_DEFAULT_REGION)
+
+
+func get_direction_value(direction: Direction, key: String, fallback: Variant) -> Variant:
+	if not DIRECTION_DATA.has(direction):
+		return fallback
+
+	return DIRECTION_DATA[direction][key]
+
+
+func refresh_indicators() -> void:
+	var spent: Array[int] = []
+
+	for direction in ALL_DIRECTIONS:
+		if not available_directions.has(direction):
+			spent.append(direction)
+
+	indicators.set_state(spent, get_player_color())
+
+
+func refresh_lock_indicators() -> void:
+	indicators.set_lock_state(
+		punch_direction != Direction.NONE,
+		dodge_direction != Direction.NONE,
+		get_attacker_color(),
+		get_defender_color(),
+	)
+
+
+func flash_puncher() -> void:
+	puncher.modulate = Color(0.84, 0.31, 0.21, 1.0)
+	await get_tree().create_timer(INPUT_FLASH_DURATION).timeout
+	if state == State.INPUT:
+		set_player_color()
+
+
+func flash_shadow() -> void:
+	shadow.modulate = Color(1, 1, 1, 0.5)
+	await get_tree().create_timer(INPUT_FLASH_DURATION).timeout
+	if state == State.INPUT:
+		set_player_color()
+
+
+func get_player_color() -> Color:
+	return get_attacker_color()
+
+
+func get_attacker_color() -> Color:
+	return player_one_color if current_player == PLAYER_ONE else player_two_color
+
+
+func get_defender_color() -> Color:
+	return player_two_color if current_player == PLAYER_ONE else player_one_color
+
+
+func set_player_color(alpha: float = 1.0) -> void:
+	var attacker_color := get_attacker_color()
+	var defender_color := get_defender_color()
+	attacker_color.a = alpha
+	defender_color.a = alpha
+	puncher.modulate = attacker_color
+	shadow.modulate = defender_color
+
+
+func reset_puncher() -> void:
+	puncher.play(&"default")
+	puncher.position = PUNCHER_DEFAULT_POSITION
+
+
+func reset_shadow() -> void:
+	shadow.region_rect = SHADOW_DEFAULT_REGION
+	shadow.position = SHADOW_DEFAULT_POSITION
+	shadow.scale = SHADOW_DEFAULT_SCALE
+
+
+func reset_cracks() -> void:
+	for crack in crack_sprites:
+		crack.hide()
+#endregion
+
+
+#region Camera
+func apply_shake(strength: float = -1.0) -> void:
+	shake_strength = max_shake_strength if strength < 0.0 else strength
+
+
+func update_camera_shake(delta: float) -> void:
+	var interpolation_weight := minf(shake_decay_rate * delta, 1.0)
+	shake_strength = lerpf(shake_strength, 0.0, interpolation_weight)
+	camera.offset = get_random_camera_offset()
+
+
+func get_random_camera_offset() -> Vector2:
+	return Vector2(
+		random.randf_range(-shake_strength, shake_strength),
+		random.randf_range(-shake_strength, shake_strength),
+	)
+#endregion
+
+
+#region Intro / outro
 func animate_bars_in() -> void:
 	var start_y_offset := 600.0
-	var lives_original_position: Vector2 = $lives.position
 
 	camera.zoom = Vector2(INTRO_ZOOM, INTRO_ZOOM)
 
 	top_bar.position = TOP_BAR_TARGET_POSITION + Vector2(0, -start_y_offset)
 	bottom_bar.position = BOTTOM_BAR_TARGET_POSITION + Vector2(0, start_y_offset)
-	$lives.position = lives_original_position + Vector2(0, start_y_offset)
 
 	var zoom_tween := create_tween()
 	zoom_tween.tween_property(
@@ -130,97 +605,21 @@ func animate_bars_in() -> void:
 		BOTTOM_BAR_TARGET_POSITION,
 		BAR_SLIDE_DURATION,
 	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	bottom_tween.tween_property(
-		$lives,
-		^"position",
-		lives_original_position,
-		BAR_SLIDE_DURATION,
-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 	await bottom_tween.finished
 	await get_tree().create_timer(0.3).timeout
-	is_intro_playing = false
 
-
-func handle_player_inputs() -> void:
-	if arrow_direction == Direction.NONE:
-		var direction := get_arrow_direction()
-		if direction != Direction.NONE:
-			arrow_direction = direction
-			flash_puncher()
-
-	if wasd_direction == Direction.NONE:
-		var direction := get_wasd_direction()
-		if direction != Direction.NONE:
-			wasd_direction = direction
-			flash_shadow()
-
-
-func get_arrow_direction() -> Direction:
-	if Input.is_action_just_pressed(&"up"):
-		return Direction.UP
-	if Input.is_action_just_pressed(&"down"):
-		return Direction.DOWN
-	if Input.is_action_just_pressed(&"left"):
-		return Direction.LEFT
-	if Input.is_action_just_pressed(&"right"):
-		return Direction.RIGHT
-
-	return Direction.NONE
-
-
-func get_wasd_direction() -> Direction:
-	if Input.is_action_just_pressed(&"w"):
-		return Direction.UP
-	if Input.is_action_just_pressed(&"s"):
-		return Direction.DOWN
-	if Input.is_action_just_pressed(&"a"):
-		return Direction.LEFT
-	if Input.is_action_just_pressed(&"d"):
-		return Direction.RIGHT
-
-	return Direction.NONE
-
-
-func flash_puncher() -> void:
-	puncher.modulate = Color(0.84, 0.31, 0.21, 1.0)
-	await get_tree().create_timer(INPUT_FLASH_DURATION).timeout
-	set_player_color()
-
-
-func flash_shadow() -> void:
-	shadow.modulate = Color(1, 1, 1, 0.5)
-	await get_tree().create_timer(INPUT_FLASH_DURATION).timeout
-	set_player_color()
-
-
-func set_player_color() -> void:
-	var color := player_one_color if current_player == PLAYER_ONE else player_two_color
-	puncher.modulate = color
-	shadow.modulate = color
-
-
-func switch_player() -> void:
-	is_switching_players = true
-	current_player = PLAYER_TWO if current_player == PLAYER_ONE else PLAYER_ONE
-	remaining_tries = MAX_TRIES
-	hits = 0
-	clear_directions()
-
-	await play_switch_animation()
-
-	reset_puncher()
-	reset_shadow()
-	reset_cracks()
-	reset_lives()
-	set_player_color()
-	is_switching_players = false
+	begin_input_phase()
 
 
 func play_switch_animation() -> void:
+	# current_player has already flipped, so the attacker colour is the incoming one.
+	var incoming_color := get_attacker_color()
+	var outgoing_color := get_defender_color()
+
 	switch_sprite.show()
 	switch_sprite.scale = Vector2(0.1, 0.1)
-	switch_sprite.modulate = player_one_color
+	switch_sprite.modulate = outgoing_color
 
 	var scale_tween := create_tween()
 	scale_tween.tween_property(
@@ -238,165 +637,31 @@ func play_switch_animation() -> void:
 
 	var flash_tween := create_tween()
 	for _flash in range(SWITCH_FLASH_COUNT):
-		flash_tween.tween_property(switch_sprite, ^"modulate", player_one_color, 0.18)
-		flash_tween.tween_property(switch_sprite, ^"modulate", player_two_color, 0.18)
+		flash_tween.tween_property(switch_sprite, ^"modulate", outgoing_color, 0.18)
+		flash_tween.tween_property(switch_sprite, ^"modulate", incoming_color, 0.18)
 
 	await scale_tween.finished
 	flash_tween.kill()
+	switch_sprite.modulate = incoming_color
 	switch_sprite.hide()
 
 
-func start_attack() -> void:
-	update_puncher_visuals()
-	update_shadow_visuals()
-	wall_particles.restart()
-	waiter.start()
-
-
-func update_puncher_visuals() -> void:
-	puncher.position = PUNCHER_DEFAULT_POSITION
-
-	match arrow_direction:
-		Direction.UP:
-			wall_particles.position = Vector2(613, 133)
-			puncher.play(&"up")
-		Direction.DOWN:
-			wall_particles.position = Vector2(610, 350)
-			puncher.play(&"down")
-		Direction.LEFT:
-			wall_particles.position = Vector2(322, 265)
-			puncher.position = PUNCHER_LEFT_POSITION
-			puncher.play(&"left")
-		Direction.RIGHT:
-			wall_particles.position = Vector2(811, 269)
-			puncher.position = PUNCHER_RIGHT_POSITION
-			puncher.play(&"right")
-
-
-func update_shadow_visuals() -> void:
-	shadow.scale = SHADOW_DEFAULT_SCALE
-
-	match wasd_direction:
-		Direction.UP:
-			shadow.position = Vector2(576, 335)
-			shadow.scale = Vector2(0.492, 0.492)
-			shadow.region_rect = Rect2(2281, 127, 777, 1326)
-		Direction.DOWN:
-			shadow.position = Vector2(582, 499)
-			shadow.scale = Vector2(0.488, 0.488)
-			shadow.region_rect = Rect2(2281, 127, 777, 1126)
-		Direction.LEFT:
-			shadow.position = Vector2(331, 370)
-			shadow.region_rect = Rect2(588, 140, 690, 1121)
-		Direction.RIGHT:
-			shadow.position = Vector2(796, 360)
-			shadow.region_rect = Rect2(1427, 149, 690, 1121)
-
-
-func reset_puncher() -> void:
-	puncher.play(&"default")
-	puncher.position = PUNCHER_DEFAULT_POSITION
-
-
-func reset_shadow() -> void:
-	shadow.region_rect = SHADOW_DEFAULT_REGION
-	shadow.position = SHADOW_DEFAULT_POSITION
-	shadow.scale = SHADOW_DEFAULT_SCALE
-
-
-func reset_cracks() -> void:
-	for crack in crack_sprites:
-		crack.hide()
-
-
-func reset_lives() -> void:
-	for life in life_sprites:
-		life.scale = LIFE_SCALE
-
-
-func update_lives(delta: float) -> void:
-	var lost_lives := clampi(MAX_TRIES - remaining_tries, 0, life_sprites.size())
-	var interpolation_weight := minf(delta * 10.0, 1.0)
-
-	for index in range(lost_lives):
-		var life := life_sprites[index]
-		life.scale = life.scale.lerp(Vector2.ZERO, interpolation_weight)
-
-
-func apply_shake() -> void:
-	shake_strength = max_shake_strength
-
-
-func update_camera_shake(delta: float) -> void:
-	var interpolation_weight := minf(shake_decay_rate * delta, 1.0)
-	shake_strength = lerpf(shake_strength, 0.0, interpolation_weight)
-	camera.offset = get_random_camera_offset()
-
-
-func get_random_camera_offset() -> Vector2:
-	return Vector2(
-		random.randf_range(-shake_strength, shake_strength),
-		random.randf_range(-shake_strength, shake_strength),
-	)
-
-
-func _on_waiter_timeout() -> void:
-	if is_wall_breaking:
-		return
-
-	if wasd_direction == arrow_direction:
-		register_hit()
-	else:
-		remaining_tries -= 1
-
-	clear_directions()
-
-	if hits < MAX_HITS:
-		reset_puncher()
-		reset_shadow()
-
-
-func clear_directions() -> void:
-	arrow_direction = Direction.NONE
-	wasd_direction = Direction.NONE
-
-
-func register_hit() -> void:
-	hits += 1
-	apply_shake()
-
-	var crack := crack_sprites[hits - 1]
-	crack.position = get_crack_position(wasd_direction)
-	crack.show()
-
-
-func get_crack_position(direction: Direction) -> Vector2:
-	match direction:
-		Direction.UP:
-			return Vector2(576, 105)
-		Direction.DOWN:
-			return Vector2(582, 299)
-		Direction.LEFT:
-			return Vector2(331, 250)
-		Direction.RIGHT:
-			return Vector2(796, 250)
-
-	return Vector2.ZERO
-
-
 func break_wall() -> void:
-	is_wall_breaking = true
+	state = State.WALL_BREAK
+	timer_bar.hide()
+	indicators.hide()
 
 	await get_tree().create_timer(WALL_BREAK_DELAY).timeout
 
 	wall_particles.position = Vector2(613, 233)
 	wall_particles.restart()
 	$Crack4.modulate = Color(1, 1, 1, 0.6)
-	apply_shake()
+	apply_shake(HIT_SHAKE_STRENGTH)
 
 	await get_tree().create_timer(WALL_BREAK_DELAY).timeout
 
-	apply_shake()
+	apply_shake(HIT_SHAKE_STRENGTH)
+	play_flash()
 	$Wall.hide()
 	$darkline.hide()
 	reset_puncher()
@@ -404,3 +669,4 @@ func break_wall() -> void:
 	$Crack4.hide()
 	shadow.hide()
 	$Shmile.show()
+#endregion
