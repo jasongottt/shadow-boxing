@@ -2,20 +2,43 @@
 
 [ext_resource type="Script" uid="uid://b85ajcdgycc5n" path="res://scripts/game.gd" id="1_dfpl8"]
 [ext_resource type="Texture2D" uid="uid://dimke74rxsota" path="res://sprites/floor.png" id="2_02i57"]
-[ext_resource type="Texture2D" uid="uid://b15p5fco2gbhi" path="res://sprites/guy.png" id="2_hck8m"]
 [ext_resource type="Texture2D" uid="uid://1d566jtgexy3" path="res://sprites/shaod.png" id="2_mwa01"]
 [ext_resource type="Texture2D" uid="uid://clb5fx5al2tp6" path="res://sprites/youwin.png" id="3_6clqb"]
-[ext_resource type="Texture2D" uid="uid://djrx06mjp361j" path="res://sprites/wall1.jpeg" id="4_i0oqb"]
+[ext_resource type="Texture2D" uid="uid://cpvcto1dehhba" path="res://sprites/bricks.png" id="4_ca42v"]
 [ext_resource type="Texture2D" uid="uid://beyvnnw8hpewc" path="res://sprites/life.png" id="6_qejtg"]
 [ext_resource type="Texture2D" uid="uid://buvwrkjsdlnfc" path="res://sprites/crack1.png" id="7_bob2h"]
 [ext_resource type="Texture2D" uid="uid://c7tx8m2ydg8hh" path="res://sprites/crack2.png" id="8_fx1v0"]
 [ext_resource type="Texture2D" uid="uid://cbe2yisg1h5pn" path="res://sprites/crack3.png" id="9_7irkr"]
 [ext_resource type="Texture2D" uid="uid://bewem67bgpiro" path="res://sprites/idle.png" id="10_trtic"]
 [ext_resource type="Texture2D" uid="uid://dup0nwg5knqrw" path="res://sprites/shmile.png" id="11_qbotp"]
+[ext_resource type="Texture2D" uid="uid://cgxv7i57as7x8" path="res://sprites/down.png" id="11_rysoc"]
 [ext_resource type="Texture2D" uid="uid://do0cu34kdgq2d" path="res://sprites/right.png" id="12_ca42v"]
 [ext_resource type="Texture2D" uid="uid://dl6epd0ddldfe" path="res://sprites/youlose.png" id="12_cfp5y"]
+[ext_resource type="Texture2D" uid="uid://dy3smmyik5w72" path="res://sprites/left.png" id="12_ssvqc"]
 [ext_resource type="Texture2D" uid="uid://do3n32e7nc0dw" path="res://sprites/up.png" id="13_rysoc"]
 [ext_resource type="Texture2D" uid="uid://0u5iwky8kddt" path="res://sprites/switch.png" id="14_trtic"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rysoc"]
+atlas = ExtResource("4_ca42v")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qouja"]
+atlas = ExtResource("4_ca42v")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wljb1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rysoc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qouja")
+}],
+"loop": true,
+"name": &"default",
+"speed": 2.0
+}]
 
 [sub_resource type="Curve" id="Curve_vcsiq"]
 _data = [Vector2(0, 1), 0.0, -0.0769558, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -37,13 +60,45 @@ region = Rect2(0, 32, 32, 32)
 atlas = ExtResource("10_trtic")
 region = Rect2(32, 32, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_trtic"]
-atlas = ExtResource("2_hck8m")
-region = Rect2(2105, 0, 421, 764)
+[sub_resource type="AtlasTexture" id="AtlasTexture_wljb1"]
+atlas = ExtResource("11_rysoc")
+region = Rect2(0, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ca42v"]
-atlas = ExtResource("2_hck8m")
-region = Rect2(1026, 0, 625, 764)
+[sub_resource type="AtlasTexture" id="AtlasTexture_v2yb1"]
+atlas = ExtResource("11_rysoc")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_js0lu"]
+atlas = ExtResource("11_rysoc")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gxtfn"]
+atlas = ExtResource("11_rysoc")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_twgab"]
+atlas = ExtResource("11_rysoc")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_02fa5"]
+atlas = ExtResource("12_ssvqc")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nepv3"]
+atlas = ExtResource("12_ssvqc")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7025r"]
+atlas = ExtResource("12_ssvqc")
+region = Rect2(0, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m4url"]
+atlas = ExtResource("12_ssvqc")
+region = Rect2(64, 64, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8ool0"]
+atlas = ExtResource("12_ssvqc")
+region = Rect2(0, 128, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_37s47"]
 atlas = ExtResource("12_ca42v")
@@ -102,19 +157,43 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_trtic")
+"texture": SubResource("AtlasTexture_wljb1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_v2yb1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_js0lu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gxtfn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_twgab")
 }],
 "loop": true,
 "name": &"down",
-"speed": 5.0
+"speed": 7.0
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ca42v")
+"texture": SubResource("AtlasTexture_02fa5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nepv3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7025r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m4url")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8ool0")
 }],
 "loop": true,
 "name": &"left",
-"speed": 5.0
+"speed": 7.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -131,7 +210,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"right",
-"speed": 5.0
+"speed": 7.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -173,13 +252,13 @@ position = Vector2(564, 176)
 scale = Vector2(0.554245, 0.554245)
 texture = ExtResource("3_6clqb")
 
-[node name="Wall" type="Sprite2D" parent="." unique_id=798650907]
+[node name="Wall" type="AnimatedSprite2D" parent="." unique_id=2062302868]
 modulate = Color(0.776471, 0.607843, 0.678431, 1)
-position = Vector2(571, 108)
-scale = Vector2(1.6028, 1.64444)
-texture = ExtResource("4_i0oqb")
-region_enabled = true
-region_rect = Rect2(-1, -1.5, 563.935, 341.392)
+position = Vector2(286, 159)
+scale = Vector2(14.27015, 14.6408825)
+sprite_frames = SubResource("SpriteFrames_wljb1")
+autoplay = "default"
+frame_progress = 0.39459777
 
 [node name="Crack4" type="Sprite2D" parent="." unique_id=903930941]
 modulate = Color(1, 1, 1, 0)
@@ -254,9 +333,9 @@ texture_filter = 1
 position = Vector2(582.00006, 178.00003)
 scale = Vector2(13, 13)
 sprite_frames = SubResource("SpriteFrames_ssvqc")
-animation = &"right"
+animation = &"left"
 autoplay = "default"
-frame_progress = 0.5087506
+frame_progress = 0.8711321
 
 [node name="blackbar1" type="Sprite2D" parent="." unique_id=1339569625]
 modulate = Color(0, 0, 0, 1)

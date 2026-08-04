@@ -162,7 +162,7 @@ const TURN_TIMER_BAR_SCRIPT := preload("res://scripts/turn_timer_bar.gd")
 @export var shake_decay_rate: float = 5.0
 
 @onready var camera: Camera2D = $camera
-@onready var wall_sprite: Sprite2D = $Wall
+@onready var wall_sprite: AnimatedSprite2D = $Wall
 @onready var floor_sprites: Array[Sprite2D] = [
 	$Floor,
 	$Floor2,
