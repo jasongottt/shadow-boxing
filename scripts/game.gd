@@ -31,11 +31,11 @@ const PUNCHER_IDLE_ANIMATION := &"default"
 
 const PUNCHER_FRAME_SIZE := 500.0
 
-const PUNCHER_ANCHOR := Vector2(151.5, 466.0)
+const PUNCHER_ANCHOR := Vector2(211.5, 366.0)
 
 const PUNCHER_BODY_TEXELS := 208.0
 const PUNCHER_BODY_PIXELS := 273.0
-const PUNCHER_SCALE := PUNCHER_BODY_PIXELS / PUNCHER_BODY_TEXELS
+const PUNCHER_SCALE := 1.5
 
 ## The point in the world the fighter's feet plant on.
 const PUNCHER_GROUND := Vector2(568.594, 585.0)

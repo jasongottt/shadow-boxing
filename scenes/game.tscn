@@ -8,8 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://buvwrkjsdlnfc" path="res://sprites/crack1.png" id="7_bob2h"]
 [ext_resource type="Texture2D" uid="uid://c7tx8m2ydg8hh" path="res://sprites/crack2.png" id="8_fx1v0"]
 [ext_resource type="Texture2D" uid="uid://dq8ib4eiatdeg" path="res://sprites/shadidle.png" id="8_rysoc"]
+[ext_resource type="Texture2D" uid="uid://buht5cdf4p5ga" path="res://sprites/shadleft.png" id="8_ssvqc"]
 [ext_resource type="Texture2D" uid="uid://cbe2yisg1h5pn" path="res://sprites/crack3.png" id="9_7irkr"]
-[ext_resource type="Texture2D" uid="uid://77c6de74fcsx" path="res://sprites/shadup.png" id="9_ssvqc"]
 [ext_resource type="Texture2D" uid="uid://dup0nwg5knqrw" path="res://sprites/shmile.png" id="11_qbotp"]
 [ext_resource type="Texture2D" uid="uid://cgxv7i57as7x8" path="res://sprites/down.png" id="11_rysoc"]
 [ext_resource type="Texture2D" uid="uid://jiei31udl31m" path="res://sprites/idletest.png" id="11_ssvqc"]
@@ -30,41 +30,48 @@ animations = [{
 "speed": 0.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_rysoc"]
+atlas = ExtResource("8_rysoc")
+region = Rect2(0, 0, 800, 500)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_05nbr"]
 atlas = ExtResource("8_rysoc")
-region = Rect2(0, 0, 128, 128)
+region = Rect2(800, 0, 800, 500)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_0sl42"]
 atlas = ExtResource("8_rysoc")
-region = Rect2(128, 0, 128, 128)
+region = Rect2(0, 500, 800, 500)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_oaba0"]
 atlas = ExtResource("8_rysoc")
-region = Rect2(0, 128, 128, 128)
+region = Rect2(800, 500, 800, 500)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_458eo"]
-atlas = ExtResource("9_ssvqc")
-region = Rect2(0, 0, 128, 128)
+atlas = ExtResource("8_ssvqc")
+region = Rect2(0, 0, 800, 500)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_h3rex"]
-atlas = ExtResource("9_ssvqc")
-region = Rect2(128, 0, 128, 128)
+atlas = ExtResource("8_ssvqc")
+region = Rect2(800, 0, 800, 500)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_fedci"]
-atlas = ExtResource("9_ssvqc")
-region = Rect2(0, 128, 128, 128)
+atlas = ExtResource("8_ssvqc")
+region = Rect2(1600, 0, 800, 500)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8qswn"]
-atlas = ExtResource("9_ssvqc")
-region = Rect2(128, 128, 128, 128)
+atlas = ExtResource("8_ssvqc")
+region = Rect2(0, 500, 800, 500)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_rm0al"]
-atlas = ExtResource("9_ssvqc")
-region = Rect2(0, 256, 128, 128)
+atlas = ExtResource("8_ssvqc")
+region = Rect2(800, 500, 800, 500)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_458eo"]
 animations = [{
 "frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rysoc")
+}, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_05nbr")
 }, {
@@ -95,8 +102,8 @@ animations = [{
 "texture": SubResource("AtlasTexture_rm0al")
 }],
 "loop": true,
-"name": &"up",
-"speed": 7.0
+"name": &"left",
+"speed": 12.0
 }]
 
 [sub_resource type="Curve" id="Curve_vcsiq"]
@@ -372,18 +379,13 @@ position = Vector2(563, 135)
 scale = Vector2(0.43, 0.43)
 texture = ExtResource("9_7irkr")
 
-[node name="darkline" type="Sprite2D" parent="." unique_id=2039651026]
-self_modulate = Color(0.745098, 0.745098, 0.745098, 1)
-position = Vector2(581, 394.328)
-scale = Vector2(0.808203, 0.018533)
-texture = ExtResource("2_02i57")
-
 [node name="shadow" type="AnimatedSprite2D" parent="." unique_id=826273536]
 texture_filter = 1
-position = Vector2(550, 297)
-scale = Vector2(5, 5)
+position = Vector2(650, 302)
+scale = Vector2(1.4110448, 1.4110448)
 sprite_frames = SubResource("SpriteFrames_458eo")
 autoplay = "default"
+frame_progress = 0.8370348
 
 [node name="wallpart" type="CPUParticles2D" parent="." unique_id=1588674007]
 position = Vector2(811, 269)
@@ -408,23 +410,22 @@ color = Color(0.576471, 0.270588, 0.27451, 1)
 
 [node name="puncher" type="AnimatedSprite2D" parent="." unique_id=1500218699]
 texture_filter = 1
-position = Vector2(673, 301.5)
-scale = Vector2(1.3125, 1.3125)
+position = Vector2(623, 334)
+scale = Vector2(1.4764488, 1.4764488)
 sprite_frames = SubResource("SpriteFrames_ssvqc")
 autoplay = "default"
+frame_progress = 0.73094213
 
 [node name="blackbar1" type="Sprite2D" parent="." unique_id=1339569625]
-visible = false
 modulate = Color(0, 0, 0, 1)
-position = Vector2(591, 721)
+position = Vector2(591, 823.00006)
 rotation = -1.5707941
 scale = Vector2(0.28, 2.4)
 texture = ExtResource("2_02i57")
 
 [node name="blackbar2" type="Sprite2D" parent="." unique_id=1267789995]
-visible = false
 modulate = Color(0, 0, 0, 1)
-position = Vector2(593.00006, -73)
+position = Vector2(593.00006, -152)
 rotation = -1.5707941
 scale = Vector2(0.28, 2.4)
 texture = ExtResource("2_02i57")
