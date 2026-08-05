@@ -346,8 +346,8 @@ texture = ExtResource("3_6clqb")
 
 [node name="Wall" type="AnimatedSprite2D" parent="." unique_id=2062302868]
 modulate = Color(0.776471, 0.607843, 0.678431, 1)
-position = Vector2(286, 159)
-scale = Vector2(14.27015, 14.6408825)
+position = Vector2(439, 219)
+scale = Vector2(9.696936, 9.948858)
 sprite_frames = SubResource("SpriteFrames_wljb1")
 autoplay = "default"
 frame_progress = 0.928823
@@ -412,8 +412,8 @@ texture = ExtResource("2_02i57")
 
 [node name="shadow" type="AnimatedSprite2D" parent="." unique_id=826273536]
 texture_filter = 1
-position = Vector2(550, 297)
-scale = Vector2(5, 5)
+position = Vector2(614, 179.99998)
+scale = Vector2(7.890179, 7.890179)
 sprite_frames = SubResource("SpriteFrames_458eo")
 animation = &"up"
 autoplay = "default"

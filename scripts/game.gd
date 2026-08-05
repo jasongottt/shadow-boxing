@@ -134,11 +134,26 @@ const WASD_ACTIONS := {
 const TURN_TIME := 3.0
 const TIMEOUT_PAUSE := 0.5
 
+## Every fighter sheet is authored to the same five-beat shape: frame 0 neutral,
+## 1 wind-up, 2 full extension, 3 extension held, 4 recovery. Frame 2 is the one
+## that touches the wall (and the top of the shadow's leap), so the replay is
+## timed against it -- the crack, the particles and the shake all land on the
+## frame that actually connects instead of on a wind-up.
+const CONTACT_FRAME := 2
+
 const SEQUENCE_START_DELAY := 0.3
-const REPLAY_GHOST_DURATION := 0.14
+
+## Seconds from the start of a punch to its contact frame. The sheets' authored
+## fps is scaled to fit these windows, so a ghost replays as a fast-forward of
+## the same swing rather than being cut off before the arm ever extends.
+const REPLAY_GHOST_CONTACT_TIME := 0.13
+const REPLAY_GHOST_HOLD := 0.05
 const REPLAY_GHOST_GAP := 0.05
 const REPLAY_GHOST_ALPHA := 0.4
-const REPLAY_LIVE_DURATION := 0.45
+const REPLAY_LIVE_CONTACT_TIME := 0.26
+## Long enough to outlast HIT_STOP_DURATION, so the freeze-frame ends while the
+## fist is still planted in the wall.
+const REPLAY_LIVE_HOLD := 0.19
 const REPLAY_LIVE_GAP := 0.2
 
 const CRACK_POP_SCALE := 1.45
@@ -353,12 +368,16 @@ func play_punch_sequence() -> void:
 	for index in range(punch_history.size()):
 		var punch: Dictionary = punch_history[index]
 		var is_newest := index == last_index
+		var contact_time := (
+			REPLAY_LIVE_CONTACT_TIME if is_newest else REPLAY_GHOST_CONTACT_TIME
+		)
 
-		show_punch(punch, is_newest)
+		show_punch(punch, is_newest, contact_time)
 
-		await get_tree().create_timer(
-			REPLAY_LIVE_DURATION if is_newest else REPLAY_GHOST_DURATION
-		).timeout
+		# Let the swing run all the way to the wall before anything reacts to it.
+		await get_tree().create_timer(contact_time).timeout
+
+		hold_contact_frame()
 
 		if punch["hit"]:
 			play_hit_feedback(punch, shown_hits, is_newest)
@@ -366,9 +385,10 @@ func play_punch_sequence() -> void:
 		elif is_newest:
 			apply_shake(MISS_SHAKE_STRENGTH)
 
-		if is_newest:
-			# Unscaled so the freeze-frame doesn't stretch with Engine.time_scale.
-			await get_tree().create_timer(HIT_STOP_DURATION, true, false, true).timeout
+		# Unscaled so the freeze-frame doesn't stretch with Engine.time_scale.
+		await get_tree().create_timer(
+			REPLAY_LIVE_HOLD if is_newest else REPLAY_GHOST_HOLD, true, false, true
+		).timeout
 
 		reset_puncher()
 		reset_shadow()
@@ -460,11 +480,29 @@ func get_pressed_direction(actions: Dictionary) -> Direction:
 
 
 #region Presentation
-func show_punch(punch: Dictionary, is_newest: bool) -> void:
+func show_punch(punch: Dictionary, is_newest: bool, contact_time: float) -> void:
 	var alpha := 1.0 if is_newest else REPLAY_GHOST_ALPHA
 	set_player_color(alpha)
-	update_puncher_visuals(punch["punch"])
-	update_shadow_visuals(punch["dodge"])
+	update_puncher_visuals(punch["punch"], contact_time)
+	update_shadow_visuals(punch["dodge"], contact_time)
+
+
+## Freezes both fighters on the frame that connects. Without this the sheets --
+## which loop -- would keep running through their recovery frames and back to
+## neutral underneath the crack, the hit-stop and the shake.
+func hold_contact_frame() -> void:
+	freeze_on_contact(puncher, PUNCHER_IDLE_ANIMATION)
+	freeze_on_contact(shadow, SHADOW_IDLE_ANIMATION)
+
+
+func freeze_on_contact(sprite: AnimatedSprite2D, idle_animation: StringName) -> void:
+	# Dodges that reuse the idle sheet have no strike to freeze; they just stand
+	# somewhere else, and should keep breathing.
+	if sprite.animation == idle_animation:
+		return
+
+	sprite.set_frame_and_progress(CONTACT_FRAME, 0.0)
+	sprite.pause()
 
 
 func play_hit_feedback(punch: Dictionary, crack_index: int, is_newest: bool) -> void:
@@ -520,20 +558,29 @@ func play_flash() -> void:
 	flash_tween.tween_property(flash_rect, ^"modulate:a", 0.0, FLASH_FADE_DURATION)
 
 
-func update_puncher_visuals(direction: Direction) -> void:
+func update_puncher_visuals(direction: Direction, contact_time: float = 0.0) -> void:
 	var animation: StringName = get_direction_value(
 		direction, "animation", PUNCHER_IDLE_ANIMATION
 	)
-	apply_puncher_pose(animation)
+	apply_puncher_pose(animation, contact_time)
 	wall_particles.position = get_direction_value(
 		direction, "particle_position", wall_particles.position
 	)
 
 
-func update_shadow_visuals(direction: Direction) -> void:
+func update_shadow_visuals(direction: Direction, contact_time: float = 0.0) -> void:
+	var animation: StringName = get_direction_value(
+		direction, "shadow_animation", SHADOW_IDLE_ANIMATION
+	)
+
+	# Side and low dodges reuse the idle sheet and only change where the
+	# silhouette stands, so there is no leap to time against the punch.
+	var dodge_contact_time := 0.0 if animation == SHADOW_IDLE_ANIMATION else contact_time
+
 	apply_shadow_pose(
 		get_direction_value(direction, "shadow_feet", SHADOW_DEFAULT_FEET),
-		get_direction_value(direction, "shadow_animation", SHADOW_IDLE_ANIMATION),
+		animation,
+		dodge_contact_time,
 	)
 
 
@@ -638,12 +685,45 @@ func get_puncher_base_position(animation: StringName) -> Vector2:
 
 
 ## Plays an animation on the puncher with the scale/position that animation needs.
-func apply_puncher_pose(animation: StringName) -> void:
+func apply_puncher_pose(animation: StringName, contact_time: float = 0.0) -> void:
 	var pose: Dictionary = PUNCHER_POSES.get(animation, PUNCHER_POSES[PUNCHER_IDLE_ANIMATION])
 	var pose_scale: float = pose["scale"]
 	puncher.scale = Vector2(pose_scale, pose_scale)
 	puncher.position = pose["position"]
-	puncher.play(animation)
+	start_animation(puncher, animation, contact_time)
+
+
+## Starts an animation, optionally stretching or compressing it so CONTACT_FRAME
+## arrives exactly `contact_time` seconds from now. Passing 0.0 plays the sheet
+## at its authored speed.
+func start_animation(
+	sprite: AnimatedSprite2D, animation: StringName, contact_time: float
+) -> void:
+	# play() only rewinds when the animation name changes, and pause() leaves the
+	# playhead wherever the last freeze put it, so a direction thrown twice in a
+	# row would otherwise resume mid-swing instead of winding up again.
+	var must_rewind := contact_time > 0.0 or sprite.animation != animation
+
+	sprite.speed_scale = get_contact_speed_scale(sprite, animation, contact_time)
+	sprite.play(animation)
+
+	if must_rewind:
+		sprite.set_frame_and_progress(0, 0.0)
+
+
+## How much to scale an animation's authored fps so its contact frame lands
+## `contact_time` seconds after it starts.
+func get_contact_speed_scale(
+	sprite: AnimatedSprite2D, animation: StringName, contact_time: float
+) -> float:
+	if contact_time <= 0.0:
+		return 1.0
+
+	var fps: float = sprite.sprite_frames.get_animation_speed(animation)
+	if fps <= 0.0:
+		return 1.0
+
+	return (CONTACT_FRAME / fps) / contact_time
 
 
 func reset_puncher() -> void:
@@ -658,15 +738,12 @@ func get_shadow_node_position(feet_position: Vector2) -> Vector2:
 
 ## Scale is constant across poses, and every sheet is anchored the same way, so
 ## the shadow never jumps or resizes when the animation changes.
-func apply_shadow_pose(feet_position: Vector2, animation: StringName) -> void:
+func apply_shadow_pose(
+	feet_position: Vector2, animation: StringName, contact_time: float = 0.0
+) -> void:
 	shadow.scale = SHADOW_DEFAULT_SCALE
 	shadow.position = get_shadow_node_position(feet_position)
-
-	# Restart so a dodge always plays from the first frame of its leap.
-	if shadow.animation != animation:
-		shadow.frame = 0
-
-	shadow.play(animation)
+	start_animation(shadow, animation, contact_time)
 
 
 func reset_shadow() -> void:
