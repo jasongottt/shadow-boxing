@@ -169,11 +169,8 @@ const FLASH_FADE_DURATION := 0.22
 
 const WALL_BREAK_DELAY := 1.0
 const SWITCH_FLASH_COUNT := 6
-const BAR_SLIDE_DURATION := 1.0
-const BAR_SLIDE_STAGGER := 0.12
+const INTRO_ZOOM_DURATION := 1.12
 const INTRO_ZOOM := 2.2
-const TOP_BAR_TARGET_POSITION := Vector2(593, -143)
-const BOTTOM_BAR_TARGET_POSITION := Vector2(591, 791)
 
 const INDICATORS_POSITION := Vector2(576, 664)
 const TIMER_BAR_POSITION := Vector2(576, 728)
@@ -196,8 +193,6 @@ const TURN_TIMER_BAR_SCRIPT := preload("res://scripts/turn_timer_bar.gd")
 @onready var shadow: AnimatedSprite2D = $shadow
 @onready var switch_sprite: AnimatedSprite2D = $switch
 @onready var wall_particles: CPUParticles2D = $wallpart
-@onready var top_bar: Sprite2D = $blackbar2
-@onready var bottom_bar: Sprite2D = $blackbar1
 var indicators: DirectionIndicators
 var timer_bar: TurnTimerBar
 var flash_rect: ColorRect
@@ -730,39 +725,17 @@ func get_random_camera_offset() -> Vector2:
 
 #region Intro / outro
 func animate_bars_in() -> void:
-	var start_y_offset := 600.0
-
 	camera.zoom = Vector2(INTRO_ZOOM, INTRO_ZOOM)
-
-	top_bar.position = TOP_BAR_TARGET_POSITION + Vector2(0, -start_y_offset)
-	bottom_bar.position = BOTTOM_BAR_TARGET_POSITION + Vector2(0, start_y_offset)
 
 	var zoom_tween := create_tween()
 	zoom_tween.tween_property(
 		camera,
 		^"zoom",
 		Vector2.ONE,
-		BAR_SLIDE_DURATION + BAR_SLIDE_STAGGER,
+		INTRO_ZOOM_DURATION,
 	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
-	var top_tween := create_tween()
-	top_tween.tween_property(
-		top_bar,
-		^"position",
-		TOP_BAR_TARGET_POSITION,
-		BAR_SLIDE_DURATION,
-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-
-	var bottom_tween := create_tween()
-	bottom_tween.tween_interval(BAR_SLIDE_STAGGER)
-	bottom_tween.tween_property(
-		bottom_bar,
-		^"position",
-		BOTTOM_BAR_TARGET_POSITION,
-		BAR_SLIDE_DURATION,
-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-
-	await bottom_tween.finished
+	await zoom_tween.finished
 	await get_tree().create_timer(0.3).timeout
 
 	begin_input_phase()
@@ -819,7 +792,6 @@ func break_wall() -> void:
 	apply_shake(HIT_SHAKE_STRENGTH)
 	play_flash()
 	$Wall.hide()
-	$darkline.hide()
 	reset_puncher()
 	reset_cracks()
 	$Crack4.hide()

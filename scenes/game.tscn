@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://b005746ocb26f"]
 
 [ext_resource type="Script" uid="uid://b85ajcdgycc5n" path="res://scripts/game.gd" id="1_dfpl8"]
-[ext_resource type="Texture2D" uid="uid://dimke74rxsota" path="res://sprites/floor.png" id="2_02i57"]
 [ext_resource type="Texture2D" uid="uid://clb5fx5al2tp6" path="res://sprites/youwin.png" id="3_6clqb"]
 [ext_resource type="Texture2D" uid="uid://dpl3suhtubdvl" path="res://sprites/wall.png" id="4_ssvqc"]
 [ext_resource type="Texture2D" uid="uid://beyvnnw8hpewc" path="res://sprites/life.png" id="6_qejtg"]
@@ -18,6 +17,8 @@
 [ext_resource type="Texture2D" uid="uid://dy3smmyik5w72" path="res://sprites/left.png" id="12_ssvqc"]
 [ext_resource type="Texture2D" uid="uid://do3n32e7nc0dw" path="res://sprites/up.png" id="13_rysoc"]
 [ext_resource type="Texture2D" uid="uid://0u5iwky8kddt" path="res://sprites/switch.png" id="14_trtic"]
+[ext_resource type="Texture2D" uid="uid://d2y4xlardqc3p" path="res://sprites/lightpoint.png" id="16_264po"]
+[ext_resource type="Texture2D" uid="uid://5prl7t6mplwu" path="res://sprites/light.png" id="18_ssvqc"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wljb1"]
 animations = [{
@@ -306,6 +307,42 @@ animations = [{
 "speed": 12.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_pf7vy"]
+atlas = ExtResource("18_ssvqc")
+region = Rect2(0, 0, 1000, 1000)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o8ni1"]
+atlas = ExtResource("18_ssvqc")
+region = Rect2(1000, 0, 1000, 1000)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3hbvx"]
+atlas = ExtResource("18_ssvqc")
+region = Rect2(0, 1000, 1000, 1000)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q8j3a"]
+atlas = ExtResource("18_ssvqc")
+region = Rect2(1000, 1000, 1000, 1000)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ms3bu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pf7vy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o8ni1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3hbvx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q8j3a")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_qouja"]
 atlas = ExtResource("14_trtic")
 region = Rect2(0, 0, 172, 172)
@@ -331,14 +368,14 @@ animations = [{
 [node name="game" type="Node2D" unique_id=1041176778]
 script = ExtResource("1_dfpl8")
 
-[node name="Youwinshadow" type="Sprite2D" parent="." unique_id=2079178948]
-modulate = Color(0, 0, 0, 0.262745)
-position = Vector2(569, 191)
+[node name="Youwin" type="Sprite2D" parent="." unique_id=1436997927]
+position = Vector2(564, 176)
 scale = Vector2(0.554245, 0.554245)
 texture = ExtResource("3_6clqb")
 
-[node name="Youwin" type="Sprite2D" parent="." unique_id=1436997927]
-position = Vector2(564, 176)
+[node name="Youwinshadow" type="Sprite2D" parent="." unique_id=2079178948]
+modulate = Color(0, 0, 0, 0.262745)
+position = Vector2(569, 191)
 scale = Vector2(0.554245, 0.554245)
 texture = ExtResource("3_6clqb")
 
@@ -384,8 +421,10 @@ texture_filter = 1
 position = Vector2(650, 302)
 scale = Vector2(1.4110448, 1.4110448)
 sprite_frames = SubResource("SpriteFrames_458eo")
+animation = &"left"
 autoplay = "default"
-frame_progress = 0.8370348
+frame = 2
+frame_progress = 0.8794495
 
 [node name="wallpart" type="CPUParticles2D" parent="." unique_id=1588674007]
 position = Vector2(811, 269)
@@ -413,22 +452,25 @@ texture_filter = 1
 position = Vector2(623, 334)
 scale = Vector2(1.4764488, 1.4764488)
 sprite_frames = SubResource("SpriteFrames_ssvqc")
+animation = &"left"
 autoplay = "default"
-frame_progress = 0.73094213
+frame = 1
+frame_progress = 0.19413008
 
-[node name="blackbar1" type="Sprite2D" parent="." unique_id=1339569625]
-modulate = Color(0, 0, 0, 1)
-position = Vector2(591, 823.00006)
-rotation = -1.5707941
-scale = Vector2(0.28, 2.4)
-texture = ExtResource("2_02i57")
+[node name="light" type="AnimatedSprite2D" parent="." unique_id=1194251676]
+self_modulate = Color(1, 1, 0.7372549, 1)
+position = Vector2(654, 159)
+sprite_frames = SubResource("SpriteFrames_ms3bu")
+autoplay = "default"
+frame_progress = 0.36580718
 
-[node name="blackbar2" type="Sprite2D" parent="." unique_id=1267789995]
-modulate = Color(0, 0, 0, 1)
-position = Vector2(593.00006, -152)
-rotation = -1.5707941
-scale = Vector2(0.28, 2.4)
-texture = ExtResource("2_02i57")
+[node name="PointLight2D" type="PointLight2D" parent="light" unique_id=1297360806]
+position = Vector2(252, 183)
+color = Color(1, 1, 0.53333336, 1)
+energy = 0.58
+shadow_color = Color(0, 0, 0, 0.7647059)
+texture = ExtResource("16_264po")
+texture_scale = 2.19
 
 [node name="Shmile" type="Sprite2D" parent="." unique_id=1239723086]
 visible = false
@@ -449,6 +491,18 @@ scale = Vector2(0.57374626, 0.5737463)
 sprite_frames = SubResource("SpriteFrames_05nbr")
 autoplay = "default"
 frame_progress = 0.9901181
+
+[node name="blackbar2" type="Sprite2D" parent="." unique_id=1433709451]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(588, -140)
+scale = Vector2(1.219, 0.32000002)
+texture = ExtResource("4_ssvqc")
+
+[node name="blackbar1" type="Sprite2D" parent="." unique_id=1064119864]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(581, 812.5)
+scale = Vector2(1.228, 0.33100003)
+texture = ExtResource("4_ssvqc")
 
 [node name="camera" type="Camera2D" parent="." unique_id=435443674]
 position = Vector2(580.085, 324)

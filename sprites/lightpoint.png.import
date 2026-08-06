@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://djrx06mjp361j"
-path="res://.godot/imported/wall1.jpeg-d1f3d624049e318ad21efea406d0dc70.ctex"
+uid="uid://d2y4xlardqc3p"
+path="res://.godot/imported/lightpoint.png-b5e9e37a6664052c5d91cd989a482db6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/wall1.jpeg"
-dest_files=["res://.godot/imported/wall1.jpeg-d1f3d624049e318ad21efea406d0dc70.ctex"]
+source_file="res://sprites/lightpoint.png"
+dest_files=["res://.godot/imported/lightpoint.png-b5e9e37a6664052c5d91cd989a482db6.ctex"]
 
 [params]
 
