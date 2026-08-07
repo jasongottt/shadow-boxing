@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://cp6tydj08ycdq"]
+
+[ext_resource type="Script" uid="uid://cx6qhpl3gk6k4" path="res://scripts/main_menu.gd" id="1_menu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_button"]
+bg_color = Color(0.825, 0.332, 0.387, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.12, 0.09, 0.11, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_button_hover"]
+bg_color = Color(0.94, 0.46, 0.52, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.96, 0.82, 0.42, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="MainMenu" type="Control" unique_id=18911045]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="." unique_id=388980336]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.075, 0.055, 0.067, 1)
+
+[node name="Accent" type="ColorRect" parent="." unique_id=1029000177]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 18.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0.825, 0.332, 0.387, 1)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=893937135]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Menu" type="VBoxContainer" parent="Center" unique_id=1016007651]
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="Title" type="Label" parent="Center/Menu" unique_id=594471168]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 5
+theme_override_constants/shadow_offset_y = 6
+theme_override_font_sizes/font_size = 72
+text = "SHADOW BOXING"
+horizontal_alignment = 1
+
+[node name="Placeholder" type="Label" parent="Center/Menu" unique_id=2048721329]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.63, 0.57, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+text = "PLACEHOLDER MAIN MENU"
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="Center/Menu" unique_id=1620140994]
+custom_minimum_size = Vector2(320, 82)
+layout_mode = 2
+focus_neighbor_top = NodePath(".")
+focus_neighbor_bottom = NodePath(".")
+theme_override_colors/font_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_colors/font_focus_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_colors/font_hover_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBox_button")
+theme_override_styles/pressed = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button_hover")
+theme_override_styles/focus = SubResource("StyleBox_button_hover")
+text = "START GAME"
+
+[node name="Controls" type="Label" parent="Center/Menu" unique_id=655039777]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.67, 0.69, 1)
+theme_override_font_sizes/font_size = 18
+text = "ARROW KEYS: PUNCH     |     WASD: DODGE
+Roles swap after a missed punch"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="Center/Menu/StartButton" to="." method="_on_start_button_pressed"]

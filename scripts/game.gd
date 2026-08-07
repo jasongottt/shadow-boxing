@@ -27,84 +27,35 @@ const ALL_DIRECTIONS: Array[int] = [
 	Direction.RIGHT,
 ]
 
-const PUNCHER_IDLE_ANIMATION := &"default"
-
-const PUNCHER_FRAME_SIZE := 500.0
-
-const PUNCHER_ANCHOR := Vector2(211.5, 366.0)
-
-const PUNCHER_BODY_TEXELS := 208.0
-const PUNCHER_BODY_PIXELS := 273.0
-const PUNCHER_SCALE := 1.5
-
-## The point in the world the fighter's feet plant on.
-const PUNCHER_GROUND := Vector2(568.594, 585.0)
-
-## A node's position is the centre of its frame, so the anchor above has to be
-## converted into that centre before it can be assigned.
-const PUNCHER_POSITION := Vector2(
-	PUNCHER_GROUND.x - (PUNCHER_ANCHOR.x - PUNCHER_FRAME_SIZE / 2.0) * PUNCHER_SCALE,
-	PUNCHER_GROUND.y - (PUNCHER_ANCHOR.y - PUNCHER_FRAME_SIZE / 2.0) * PUNCHER_SCALE
-)
-const PUNCHER_NODE_SCALE := Vector2(PUNCHER_SCALE, PUNCHER_SCALE)
-
-const SHADOW_IDLE_ANIMATION := &"default"
-
-## The shadow sheets (shadidle.png, shadup.png) are 128x128 pixel-art frames.
-## Every frame is bottom-anchored -- the silhouette's feet sit on the frame's
-## bottom edge -- and centred 2 texels left of the frame centre, so all poses
-## share one anchor and swapping animations never shifts the figure.
-const SHADOW_FRAME_SIZE := 128.0
-const SHADOW_SILHOUETTE_CENTER_X := 62.0
-
-## The idle silhouette is 78 texels tall, the up-dodge leap 105. The playfield is
-## letterboxed to roughly y 33..615 by the black bars, so the scale is driven by
-## the tallest pose: 105 texels must fit in those ~582px. Scale 5 keeps the whole
-## leap on screen (peaking at y 92, right where the up-punch crack lands) and is
-## an integer, so pixels stay square under nearest-neighbour filtering exactly
-## like the puncher's PIXEL_SCALE.
-const SHADOW_PIXEL_SCALE := 5.0
-
-## Poses are authored as the point the silhouette's feet stand on; this offset
-## converts that into the node position, which is the centre of the frame.
-const SHADOW_ANCHOR_OFFSET := Vector2(
-	(SHADOW_FRAME_SIZE / 2.0 - SHADOW_SILHOUETTE_CENTER_X) * SHADOW_PIXEL_SCALE,
-	-(SHADOW_FRAME_SIZE / 2.0) * SHADOW_PIXEL_SCALE
-)
-const SHADOW_DEFAULT_FEET := Vector2(540, 617)
-const SHADOW_DEFAULT_POSITION := SHADOW_DEFAULT_FEET + SHADOW_ANCHOR_OFFSET
-const SHADOW_DEFAULT_SCALE := Vector2(SHADOW_PIXEL_SCALE, SHADOW_PIXEL_SCALE)
-
 ## Everything that differs between the four punch directions, in one table.
+## Both sheets name their poses identically, so one animation name drives the
+## punch and the dodge.
+##
+## Cracks are laid out as a compass around the silhouette rather than on top of
+## it: the shadow is solid black, so anything drawn behind it (or on it) simply
+## disappears, and the damage has to stay readable for the rest of the round.
+## Each one sits in the free wall on the side its direction points to, clear of
+## both the silhouette's idle outline and the boxer in the right foreground.
 const DIRECTION_DATA := {
 	Direction.UP: {
 		"animation": &"up",
-		"particle_position": Vector2(613, 133),
-		# The up sheet animates the leap itself, so the pose stays put.
-		"shadow_feet": SHADOW_DEFAULT_FEET,
-		"shadow_animation": &"up",
-		"crack_position": Vector2(576, 105),
+		"contact_position": Vector2(573, 70),
+		"crack_position": Vector2(520, 155),
 	},
 	Direction.DOWN: {
 		"animation": &"down",
-		"particle_position": Vector2(610, 350),
-		"shadow_feet": Vector2(582, 737),
-		"shadow_animation": SHADOW_IDLE_ANIMATION,
-		"crack_position": Vector2(582, 299),
+		"contact_position": Vector2(575, 569),
+		"crack_position": Vector2(190, 555),
 	},
 	Direction.LEFT: {
 		"animation": &"left",
-		"particle_position": Vector2(322, 265),
-		"shadow_feet": Vector2(331, 617),
-		"shadow_animation": SHADOW_IDLE_ANIMATION,
-		"crack_position": Vector2(331, 250),
+		"contact_position": Vector2(414, 356),
+		"crack_position": Vector2(165, 375),
 	},
 	Direction.RIGHT: {
 		"animation": &"right",
-		"particle_position": Vector2(811, 269),
-		"shadow_feet": Vector2(796, 617),
-		"shadow_animation": SHADOW_IDLE_ANIMATION,
-		"crack_position": Vector2(796, 250),
+		"contact_position": Vector2(651, 361),
+		"crack_position": Vector2(770, 220),
 	},
 }
 
@@ -124,30 +75,30 @@ const WASD_ACTIONS := {
 const TURN_TIME := 3.0
 const TIMEOUT_PAUSE := 0.5
 
-## Every fighter sheet is authored to the same five-beat shape: frame 0 neutral,
-## 1 wind-up, 2 full extension, 3 extension held, 4 recovery. Frame 2 is the one
-## that touches the wall (and the top of the shadow's leap), so the replay is
-## timed against it -- the crack, the particles and the shake all land on the
-## frame that actually connects instead of on a wind-up.
-const CONTACT_FRAME := 2
-
+## FighterPresentation owns the shared five-frame animation shape and contact
+## frame; this controller only decides how long each replay phase should take.
 const SEQUENCE_START_DELAY := 0.3
 
-## Seconds from the start of a punch to its contact frame. The sheets' authored
-## fps is scaled to fit these windows, so a ghost replays as a fast-forward of
-## the same swing rather than being cut off before the arm ever extends.
-const REPLAY_GHOST_CONTACT_TIME := 0.13
-const REPLAY_GHOST_HOLD := 0.05
-const REPLAY_GHOST_GAP := 0.05
-const REPLAY_GHOST_ALPHA := 0.4
-const REPLAY_LIVE_CONTACT_TIME := 0.26
-## Long enough to outlast HIT_STOP_DURATION, so the freeze-frame ends while the
-## fist is still planted in the wall.
-const REPLAY_LIVE_HOLD := 0.19
-const REPLAY_LIVE_GAP := 0.2
+## Ghosts are still shorter than the newest live swing, but each repeat gets a
+## readable wind-up, contact beat, and recovery instead of flashing by as a blur.
+const REPLAY_GHOST_CONTACT_TIME := 0.24
+const REPLAY_GHOST_HOLD := 0.075
+const REPLAY_GHOST_RECOVERY := 0.14
+const REPLAY_GHOST_GAP := 0.08
+const REPLAY_GHOST_ALPHA := 0.5
+const REPLAY_GHOST_SHAKE_STRENGTH := 12.0
+const REPLAY_GHOST_CAMERA_PUSH := 6.0
+const REPLAY_GHOST_BURST_INTENSITY := 0.78
 
-const CRACK_POP_SCALE := 1.45
-const CRACK_POP_DURATION := 0.16
+## The live swing gets a readable anticipation, a sharp contact hold, then plays
+## the authored recovery frames instead of snapping straight back to idle.
+const REPLAY_LIVE_CONTACT_TIME := 0.30
+const REPLAY_LIVE_HOLD := 0.10
+const REPLAY_LIVE_RECOVERY := 0.16
+const REPLAY_LIVE_GAP := 0.12
+
+const SHADOW_HIT_FLASH_DURATION := 0.16
+const CAMERA_PUSH_STRENGTH := 14.0
 
 ## The environment leans toward the attacking player's colour so whose turn it
 ## is readable from the whole frame, not just the two fighters.
@@ -172,10 +123,6 @@ const SWITCH_FLASH_COUNT := 6
 const INTRO_ZOOM_DURATION := 1.12
 const INTRO_ZOOM := 2.2
 
-const INDICATORS_POSITION := Vector2(576, 664)
-const TIMER_BAR_POSITION := Vector2(576, 728)
-const DIRECTION_INDICATORS_SCRIPT := preload("res://scripts/direction_indicators.gd")
-const TURN_TIMER_BAR_SCRIPT := preload("res://scripts/turn_timer_bar.gd")
 
 @export var player_one_color := Color(0.825, 0.332, 0.387, 1.0)
 @export var player_two_color := Color(0.319, 0.533, 0.769, 1.0)
@@ -193,9 +140,14 @@ const TURN_TIMER_BAR_SCRIPT := preload("res://scripts/turn_timer_bar.gd")
 @onready var shadow: AnimatedSprite2D = $shadow
 @onready var switch_sprite: AnimatedSprite2D = $switch
 @onready var wall_particles: CPUParticles2D = $wallpart
-var indicators: DirectionIndicators
-var timer_bar: TurnTimerBar
-var flash_rect: ColorRect
+# Variant avoids a resource cycle while game.tscn is loading the scripts that
+# provide these typed controller nodes. Their scene paths are validated in tests.
+@onready var indicators: Variant = $HUD/indicators
+@onready var timer_bar: Variant = $HUD/timerbar
+@onready var flash_rect: ColorRect = $HUD/flash/rect
+@onready var fighters: Variant = $Presentation/Fighters
+@onready var impacts: Variant = $Presentation/Impacts
+@onready var camera_effects: Variant = $Presentation/CameraEffects
 
 var state := State.INTRO
 ## The attacker (current_player) drives the puncher, the other player the shadow.
@@ -208,21 +160,13 @@ var punch_history: Array[Dictionary] = []
 var switch_after_sequence := false
 var turn_time_left := TURN_TIME
 var idle_time := 0.0
-var crack_base_scales: Array[Vector2] = []
-var shake_strength := 0.0
-var random := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
-	random.randomize()
-	build_hud()
-
-	for crack in crack_sprites:
-		crack_base_scales.append(crack.scale)
+	setup_presentation_effects()
 
 	reset_round_state()
-	reset_puncher()
-	reset_shadow()
+	fighters.reset()
 	set_player_color()
 	refresh_indicators()
 	apply_environment_grade()
@@ -231,35 +175,16 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	update_camera_shake(delta)
-
 	if state == State.INPUT:
 		process_input_phase(delta)
 
 
-## The HUD is built in code so the scene file stays free of UI plumbing.
-func build_hud() -> void:
-	indicators = DIRECTION_INDICATORS_SCRIPT.new()
-	indicators.name = &"indicators"
-	indicators.position = INDICATORS_POSITION
-	add_child(indicators)
-
-	timer_bar = TURN_TIMER_BAR_SCRIPT.new()
-	timer_bar.name = &"timerbar"
-	timer_bar.position = TIMER_BAR_POSITION
-	add_child(timer_bar)
-
-	var flash_layer := CanvasLayer.new()
-	flash_layer.name = &"flash"
-	add_child(flash_layer)
-
-	flash_rect = ColorRect.new()
-	flash_rect.name = &"rect"
-	flash_rect.color = Color.WHITE
-	flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	flash_layer.add_child(flash_rect)
-	flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	flash_rect.modulate.a = 0.0
+## Persistent controller and HUD nodes live in game.tscn; Game only connects
+## them to the concrete scene nodes they operate on.
+func setup_presentation_effects() -> void:
+	fighters.setup(puncher, shadow)
+	impacts.setup(wall_particles, crack_sprites)
+	camera_effects.setup(camera, max_shake_strength, shake_decay_rate)
 
 
 #region Turn flow
@@ -291,10 +216,8 @@ func process_input_phase(delta: float) -> void:
 
 ## Keeps the fighters breathing while the turn timer drains.
 func apply_idle_bob() -> void:
-	var bob := sin(idle_time * IDLE_BOB_SPEED) * IDLE_BOB_AMOUNT
-	puncher.position = PUNCHER_POSITION + Vector2(0.0, bob)
-	shadow.position = get_shadow_node_position(
-		SHADOW_DEFAULT_FEET + Vector2(0.0, bob * IDLE_SHADOW_BOB_RATIO)
+	fighters.apply_idle_bob(
+		idle_time, IDLE_BOB_SPEED, IDLE_BOB_AMOUNT, IDLE_SHADOW_BOB_RATIO
 	)
 
 
@@ -362,12 +285,18 @@ func play_punch_sequence() -> void:
 			play_hit_feedback(punch, shown_hits, is_newest)
 			shown_hits += 1
 		elif is_newest:
-			apply_shake(MISS_SHAKE_STRENGTH)
+			apply_shake(MISS_SHAKE_STRENGTH, punch["punch"])
 
 		# Unscaled so the freeze-frame doesn't stretch with Engine.time_scale.
 		await get_tree().create_timer(
 			REPLAY_LIVE_HOLD if is_newest else REPLAY_GHOST_HOLD, true, false, true
 		).timeout
+
+		var recovery_time: float = (
+			REPLAY_LIVE_RECOVERY if is_newest else REPLAY_GHOST_RECOVERY
+		)
+		fighters.play_recovery(recovery_time)
+		await get_tree().create_timer(recovery_time).timeout
 
 		reset_puncher()
 		reset_shadow()
@@ -466,61 +395,52 @@ func show_punch(punch: Dictionary, is_newest: bool, contact_time: float) -> void
 	update_shadow_visuals(punch["dodge"], contact_time)
 
 
-## Freezes both fighters on the frame that connects. Without this the sheets --
-## which loop -- would keep running through their recovery frames and back to
-## neutral underneath the crack, the hit-stop and the shake.
 func hold_contact_frame() -> void:
-	freeze_on_contact(puncher, PUNCHER_IDLE_ANIMATION)
-	freeze_on_contact(shadow, SHADOW_IDLE_ANIMATION)
-
-
-func freeze_on_contact(sprite: AnimatedSprite2D, idle_animation: StringName) -> void:
-	# Dodges that reuse the idle sheet have no strike to freeze; they just stand
-	# somewhere else, and should keep breathing.
-	if sprite.animation == idle_animation:
-		return
-
-	sprite.set_frame_and_progress(CONTACT_FRAME, 0.0)
-	sprite.pause()
+	fighters.hold_contact()
 
 
 func play_hit_feedback(punch: Dictionary, crack_index: int, is_newest: bool) -> void:
-	if crack_index < crack_sprites.size():
-		show_crack(crack_index, punch["dodge"], is_newest)
+	var direction: Direction = punch["punch"]
+	var direction_vector: Vector2 = get_direction_vector(direction)
+	var contact_position: Vector2 = get_contact_position(direction)
+	var crack_position: Vector2 = get_direction_value(
+		direction, "crack_position", Vector2.ZERO
+	)
+	impacts.show_crack(crack_index, crack_position, is_newest)
 
 	if not is_newest:
-		apply_shake(MISS_SHAKE_STRENGTH)
+		impacts.play_hit_word(
+			int(direction), contact_position, direction_vector, get_attacker_color(), 0.72
+		)
+		impacts.play_burst(
+			contact_position,
+			direction_vector,
+			get_attacker_color().lerp(Color.WHITE, 0.35),
+			REPLAY_GHOST_BURST_INTENSITY,
+		)
+		fighters.flash_shadow(0.48, 0.12)
+		apply_shake(REPLAY_GHOST_SHAKE_STRENGTH, direction)
+		apply_camera_push(direction, REPLAY_GHOST_CAMERA_PUSH)
 		return
 
-	# Only a landed punch chips the wall, and only as it happens live.
-	wall_particles.restart()
+	# The newest strike gets debris, full-screen flash, hit-stop, and the largest
+	# comic-book word in addition to the local feedback shared with its ghosts.
+	impacts.play_hit_word(
+		int(direction), contact_position, direction_vector, get_attacker_color(), 1.0
+	)
+	impacts.play_directional_debris(contact_position, direction_vector)
+	impacts.play_burst(
+		contact_position,
+		direction_vector,
+		get_attacker_color().lerp(Color.WHITE, 0.5),
+		1.2,
+	)
+	fighters.flash_shadow(0.95, SHADOW_HIT_FLASH_DURATION)
 	refresh_indicators()
-	apply_shake(HIT_SHAKE_STRENGTH)
+	apply_shake(HIT_SHAKE_STRENGTH, direction)
+	apply_camera_push(direction)
 	play_flash()
 	play_hit_stop()
-
-
-func show_crack(crack_index: int, direction: Direction, is_newest: bool) -> void:
-	var crack: Sprite2D = crack_sprites[crack_index]
-	var base_scale: Vector2 = crack_base_scales[crack_index]
-	crack.position = get_direction_value(direction, "crack_position", Vector2.ZERO)
-	crack.scale = base_scale
-	crack.show()
-
-	if not is_newest:
-		return
-
-	crack.scale = base_scale * CRACK_POP_SCALE
-
-	var pop_tween := create_tween()
-	# Ignore time scale so the pop plays through the hit-stop instead of crawling.
-	pop_tween.set_ignore_time_scale(true)
-	pop_tween.tween_property(
-		crack,
-		^"scale",
-		base_scale,
-		CRACK_POP_DURATION,
-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func play_hit_stop() -> void:
@@ -538,29 +458,15 @@ func play_flash() -> void:
 
 
 func update_puncher_visuals(direction: Direction, contact_time: float = 0.0) -> void:
-	var animation: StringName = get_direction_value(
-		direction, "animation", PUNCHER_IDLE_ANIMATION
-	)
-	apply_puncher_pose(animation, contact_time)
-	wall_particles.position = get_direction_value(
-		direction, "particle_position", wall_particles.position
-	)
+	fighters.play_punch(get_direction_animation(direction), contact_time)
 
 
 func update_shadow_visuals(direction: Direction, contact_time: float = 0.0) -> void:
-	var animation: StringName = get_direction_value(
-		direction, "shadow_animation", SHADOW_IDLE_ANIMATION
-	)
+	fighters.play_shadow(get_direction_animation(direction), contact_time)
 
-	# Side and low dodges reuse the idle sheet and only change where the
-	# silhouette stands, so there is no leap to time against the punch.
-	var dodge_contact_time := 0.0 if animation == SHADOW_IDLE_ANIMATION else contact_time
 
-	apply_shadow_pose(
-		get_direction_value(direction, "shadow_feet", SHADOW_DEFAULT_FEET),
-		animation,
-		dodge_contact_time,
-	)
+func get_direction_animation(direction: Direction) -> StringName:
+	return get_direction_value(direction, "animation", &"default")
 
 
 func get_direction_value(direction: Direction, key: String, fallback: Variant) -> Variant:
@@ -568,6 +474,24 @@ func get_direction_value(direction: Direction, key: String, fallback: Variant) -
 		return fallback
 
 	return DIRECTION_DATA[direction][key]
+
+
+func get_contact_position(direction: Direction) -> Vector2:
+	return get_direction_value(direction, "contact_position", Vector2.ZERO)
+
+
+func get_direction_vector(direction: Direction) -> Vector2:
+	match direction:
+		Direction.UP:
+			return Vector2.UP
+		Direction.DOWN:
+			return Vector2.DOWN
+		Direction.LEFT:
+			return Vector2.LEFT
+		Direction.RIGHT:
+			return Vector2.RIGHT
+		_:
+			return Vector2.ZERO
 
 
 func refresh_indicators() -> void:
@@ -603,17 +527,14 @@ func refresh_lock_indicators() -> void:
 
 
 func flash_puncher() -> void:
-	puncher.modulate = Color(0.84, 0.31, 0.21, 1.0)
+	fighters.flash_puncher(Color(0.84, 0.31, 0.21, 1.0))
 	await get_tree().create_timer(INPUT_FLASH_DURATION).timeout
 	if state == State.INPUT:
 		set_player_color()
 
 
 func flash_shadow() -> void:
-	shadow.modulate = Color(1, 1, 1, 0.5)
-	await get_tree().create_timer(INPUT_FLASH_DURATION).timeout
-	if state == State.INPUT:
-		set_player_color()
+	fighters.flash_shadow(0.42, INPUT_FLASH_DURATION * 2.0)
 
 
 func get_attacker_color() -> Color:
@@ -625,101 +546,31 @@ func get_defender_color() -> Color:
 
 
 func set_player_color(alpha: float = 1.0) -> void:
-	var attacker_color := get_attacker_color()
-	var defender_color := get_defender_color()
-	attacker_color.a = alpha
-	defender_color.a = alpha
-	puncher.modulate = attacker_color
-	shadow.modulate = defender_color
-
-
-## Every puncher animation shares one scale and one anchor, so playing a pose is
-## just a matter of (re)asserting them and starting the sheet.
-func apply_puncher_pose(animation: StringName, contact_time: float = 0.0) -> void:
-	puncher.scale = PUNCHER_NODE_SCALE
-	puncher.position = PUNCHER_POSITION
-	start_animation(puncher, animation, contact_time)
-
-
-## Starts an animation, optionally stretching or compressing it so CONTACT_FRAME
-## arrives exactly `contact_time` seconds from now. Passing 0.0 plays the sheet
-## at its authored speed.
-func start_animation(
-	sprite: AnimatedSprite2D, animation: StringName, contact_time: float
-) -> void:
-	# play() only rewinds when the animation name changes, and pause() leaves the
-	# playhead wherever the last freeze put it, so a direction thrown twice in a
-	# row would otherwise resume mid-swing instead of winding up again.
-	var must_rewind := contact_time > 0.0 or sprite.animation != animation
-
-	sprite.speed_scale = get_contact_speed_scale(sprite, animation, contact_time)
-	sprite.play(animation)
-
-	if must_rewind:
-		sprite.set_frame_and_progress(0, 0.0)
-
-
-## How much to scale an animation's authored fps so its contact frame lands
-## `contact_time` seconds after it starts.
-func get_contact_speed_scale(
-	sprite: AnimatedSprite2D, animation: StringName, contact_time: float
-) -> float:
-	if contact_time <= 0.0:
-		return 1.0
-
-	var fps: float = sprite.sprite_frames.get_animation_speed(animation)
-	if fps <= 0.0:
-		return 1.0
-
-	return (CONTACT_FRAME / fps) / contact_time
+	fighters.set_colors(get_attacker_color(), get_defender_color(), alpha)
 
 
 func reset_puncher() -> void:
-	apply_puncher_pose(PUNCHER_IDLE_ANIMATION)
-
-
-## Converts the point the silhouette's feet stand on into the AnimatedSprite2D's
-## node position, which is the centre of the (mostly empty) 128x128 frame.
-func get_shadow_node_position(feet_position: Vector2) -> Vector2:
-	return feet_position + SHADOW_ANCHOR_OFFSET
-
-
-## Scale is constant across poses, and every sheet is anchored the same way, so
-## the shadow never jumps or resizes when the animation changes.
-func apply_shadow_pose(
-	feet_position: Vector2, animation: StringName, contact_time: float = 0.0
-) -> void:
-	shadow.scale = SHADOW_DEFAULT_SCALE
-	shadow.position = get_shadow_node_position(feet_position)
-	start_animation(shadow, animation, contact_time)
+	fighters.reset_puncher()
 
 
 func reset_shadow() -> void:
-	apply_shadow_pose(SHADOW_DEFAULT_FEET, SHADOW_IDLE_ANIMATION)
+	fighters.reset_shadow()
 
 
 func reset_cracks() -> void:
-	for crack in crack_sprites:
-		crack.hide()
+	impacts.reset_cracks()
 #endregion
 
 
 #region Camera
-func apply_shake(strength: float = -1.0) -> void:
-	shake_strength = max_shake_strength if strength < 0.0 else strength
+func apply_shake(strength: float = -1.0, direction: Direction = Direction.NONE) -> void:
+	camera_effects.shake(strength, get_direction_vector(direction))
 
 
-func update_camera_shake(delta: float) -> void:
-	var interpolation_weight := minf(shake_decay_rate * delta, 1.0)
-	shake_strength = lerpf(shake_strength, 0.0, interpolation_weight)
-	camera.offset = get_random_camera_offset()
-
-
-func get_random_camera_offset() -> Vector2:
-	return Vector2(
-		random.randf_range(-shake_strength, shake_strength),
-		random.randf_range(-shake_strength, shake_strength),
-	)
+func apply_camera_push(
+	direction: Direction, strength: float = CAMERA_PUSH_STRENGTH
+) -> void:
+	camera_effects.push(get_direction_vector(direction), strength)
 #endregion
 
 
@@ -782,8 +633,7 @@ func break_wall() -> void:
 
 	await get_tree().create_timer(WALL_BREAK_DELAY).timeout
 
-	wall_particles.position = Vector2(613, 233)
-	wall_particles.restart()
+	impacts.play_wall_break_debris(Vector2(613, 233))
 	$Crack4.modulate = Color(1, 1, 1, 0.6)
 	apply_shake(HIT_SHAKE_STRENGTH)
 
@@ -795,6 +645,6 @@ func break_wall() -> void:
 	reset_puncher()
 	reset_cracks()
 	$Crack4.hide()
-	shadow.hide()
+	fighters.hide_shadow()
 	$Shmile.show()
 #endregion

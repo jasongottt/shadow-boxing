@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://dlo4c4fqlikhu"]
+
+[ext_resource type="Script" uid="uid://bu6qdelt6xhu2" path="res://scripts/direction_indicators.gd" id="1_indicators"]
+[ext_resource type="Script" uid="uid://chkbxvjxut345" path="res://scripts/turn_timer_bar.gd" id="2_timer"]
+
+[node name="HUD" type="Node" unique_id=1238976661]
+
+[node name="indicators" type="Node2D" parent="." unique_id=695204748]
+position = Vector2(576, 664)
+script = ExtResource("1_indicators")
+
+[node name="timerbar" type="Node2D" parent="." unique_id=307830680]
+position = Vector2(576, 728)
+script = ExtResource("2_timer")
+
+[node name="flash" type="CanvasLayer" parent="." unique_id=12403492]
+
+[node name="rect" type="ColorRect" parent="flash" unique_id=1727780196]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

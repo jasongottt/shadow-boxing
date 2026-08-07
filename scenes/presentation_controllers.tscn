@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://b6k6jfr7spo1h"]
+
+[ext_resource type="Script" uid="uid://f2t45tlptkrq" path="res://scripts/fighter_presentation.gd" id="1_fighters"]
+[ext_resource type="Script" uid="uid://bdem8qd24mag1" path="res://scripts/impact_presentation.gd" id="2_impacts"]
+[ext_resource type="Script" uid="uid://8ydq87rdtxbg" path="res://scripts/camera_effects.gd" id="3_camera"]
+
+[node name="Presentation" type="Node" unique_id=1323214454]
+
+[node name="Fighters" type="Node" parent="." unique_id=1294990906]
+script = ExtResource("1_fighters")
+
+[node name="Impacts" type="Node" parent="." unique_id=902735033]
+script = ExtResource("2_impacts")
+
+[node name="CameraEffects" type="Node" parent="." unique_id=66208719]
+script = ExtResource("3_camera")
