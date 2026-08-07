@@ -88,8 +88,8 @@ horizontal_alignment = 1
 [node name="StartButton" type="Button" parent="Center/Menu" unique_id=1620140994]
 custom_minimum_size = Vector2(320, 82)
 layout_mode = 2
-focus_neighbor_top = NodePath(".")
-focus_neighbor_bottom = NodePath(".")
+focus_neighbor_top = NodePath("../CustomizeButton")
+focus_neighbor_bottom = NodePath("../CustomizeButton")
 theme_override_colors/font_color = Color(0.08, 0.055, 0.065, 1)
 theme_override_colors/font_focus_color = Color(0.08, 0.055, 0.065, 1)
 theme_override_colors/font_hover_color = Color(0.08, 0.055, 0.065, 1)
@@ -100,6 +100,21 @@ theme_override_styles/hover = SubResource("StyleBox_button_hover")
 theme_override_styles/focus = SubResource("StyleBox_button_hover")
 text = "START GAME"
 
+[node name="CustomizeButton" type="Button" parent="Center/Menu" unique_id=2065317317]
+custom_minimum_size = Vector2(320, 66)
+layout_mode = 2
+focus_neighbor_top = NodePath("../StartButton")
+focus_neighbor_bottom = NodePath("../StartButton")
+theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
+theme_override_colors/font_focus_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_colors/font_hover_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBox_button")
+theme_override_styles/pressed = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button_hover")
+theme_override_styles/focus = SubResource("StyleBox_button_hover")
+text = "CUSTOMIZE"
+
 [node name="Controls" type="Label" parent="Center/Menu" unique_id=655039777]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.72, 0.67, 0.69, 1)
@@ -108,4 +123,114 @@ text = "ARROW KEYS: PUNCH     |     WASD: DODGE
 Roles swap after a missed punch"
 horizontal_alignment = 1
 
+[node name="Customize" type="VBoxContainer" parent="Center" unique_id=1765355283]
+visible = false
+custom_minimum_size = Vector2(760, 0)
+layout_mode = 2
+theme_override_constants/separation = 26
+alignment = 1
+
+[node name="Title" type="Label" parent="Center/Customize" unique_id=1136544321]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_offset_y = 5
+theme_override_font_sizes/font_size = 52
+text = "CHOOSE YOUR COLORS"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="Center/Customize" unique_id=1704441375]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.6, 0.63, 1)
+theme_override_font_sizes/font_size = 18
+text = "Colors carry into the fighters, HUD, hit words, and wall lighting"
+horizontal_alignment = 1
+
+[node name="Players" type="HBoxContainer" parent="Center/Customize" unique_id=469371123]
+layout_mode = 2
+theme_override_constants/separation = 72
+alignment = 1
+
+[node name="PlayerOne" type="VBoxContainer" parent="Center/Customize/Players" unique_id=1809394272]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="Label" type="Label" parent="Center/Customize/Players/PlayerOne" unique_id=1780883452]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
+theme_override_font_sizes/font_size = 26
+text = "PLAYER ONE"
+horizontal_alignment = 1
+
+[node name="Preview" type="ColorRect" parent="Center/Customize/Players/PlayerOne" unique_id=17767577]
+custom_minimum_size = Vector2(220, 150)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.825, 0.332, 0.387, 1)
+
+[node name="ColorPicker" type="ColorPickerButton" parent="Center/Customize/Players/PlayerOne" unique_id=1110210462]
+custom_minimum_size = Vector2(220, 58)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "CHOOSE COLOR"
+color = Color(0.825, 0.332, 0.387, 1)
+edit_alpha = false
+
+[node name="PlayerTwo" type="VBoxContainer" parent="Center/Customize/Players" unique_id=164329517]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="Label" type="Label" parent="Center/Customize/Players/PlayerTwo" unique_id=2124007480]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
+theme_override_font_sizes/font_size = 26
+text = "PLAYER TWO"
+horizontal_alignment = 1
+
+[node name="Preview" type="ColorRect" parent="Center/Customize/Players/PlayerTwo" unique_id=1539596295]
+custom_minimum_size = Vector2(220, 150)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.319, 0.533, 0.769, 1)
+
+[node name="ColorPicker" type="ColorPickerButton" parent="Center/Customize/Players/PlayerTwo" unique_id=307432437]
+custom_minimum_size = Vector2(220, 58)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "CHOOSE COLOR"
+color = Color(0.319, 0.533, 0.769, 1)
+edit_alpha = false
+
+[node name="ResetButton" type="Button" parent="Center/Customize" unique_id=1468639730]
+custom_minimum_size = Vector2(260, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBox_button")
+theme_override_styles/pressed = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button_hover")
+theme_override_styles/focus = SubResource("StyleBox_button_hover")
+text = "RESET COLORS"
+
+[node name="BackButton" type="Button" parent="Center/Customize" unique_id=1048275664]
+custom_minimum_size = Vector2(320, 66)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBox_button")
+theme_override_styles/pressed = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button_hover")
+theme_override_styles/focus = SubResource("StyleBox_button_hover")
+text = "BACK"
+
 [connection signal="pressed" from="Center/Menu/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="Center/Menu/CustomizeButton" to="." method="_on_customize_button_pressed"]
+[connection signal="color_changed" from="Center/Customize/Players/PlayerOne/ColorPicker" to="." method="_on_player_one_color_changed"]
+[connection signal="color_changed" from="Center/Customize/Players/PlayerTwo/ColorPicker" to="." method="_on_player_two_color_changed"]
+[connection signal="pressed" from="Center/Customize/ResetButton" to="." method="_on_reset_colors_pressed"]
+[connection signal="pressed" from="Center/Customize/BackButton" to="." method="_on_back_button_pressed"]

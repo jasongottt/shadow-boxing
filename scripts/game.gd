@@ -163,6 +163,8 @@ var idle_time := 0.0
 
 
 func _ready() -> void:
+	player_one_color = PlayerSettings.player_one_color
+	player_two_color = PlayerSettings.player_two_color
 	setup_presentation_effects()
 
 	reset_round_state()

@@ -581,7 +581,7 @@ autoplay = "default"
 
 [node name="light" type="AnimatedSprite2D" parent="." unique_id=1194251676]
 self_modulate = Color(1, 1, 0.7372549, 1)
-position = Vector2(654, 159)
+position = Vector2(712, 84)
 sprite_frames = SubResource("SpriteFrames_ms3bu")
 autoplay = "default"
 frame_progress = 0.36580718
