@@ -1,26 +1,153 @@
 [gd_scene format=3 uid="uid://cp6tydj08ycdq"]
 
 [ext_resource type="Script" uid="uid://cx6qhpl3gk6k4" path="res://scripts/main_menu.gd" id="1_menu"]
+[ext_resource type="Texture2D" uid="uid://fbko8lfo0pxt" path="res://sprites/titleshad.png" id="2_8ln24"]
+[ext_resource type="Texture2D" uid="uid://xcydmqy25c6" path="res://sprites/titleboxing.png" id="3_rtw2f"]
+[ext_resource type="Texture2D" uid="uid://bsggytnhwn4b5" path="res://sprites/titlelight.png" id="4_oa1go"]
+[ext_resource type="Texture2D" uid="uid://dfm7jf1vlbvic" path="res://sprites/titlelightlight.png" id="5_tbmy8"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jk1qb"]
+atlas = ExtResource("2_8ln24")
+region = Rect2(0, 0, 1500, 1500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5dd4i"]
+atlas = ExtResource("2_8ln24")
+region = Rect2(1500, 0, 1500, 1500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lgwnu"]
+atlas = ExtResource("2_8ln24")
+region = Rect2(0, 1500, 1500, 1500)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_flqon"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jk1qb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5dd4i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lgwnu")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rcqid"]
+atlas = ExtResource("3_rtw2f")
+region = Rect2(0, 0, 1500, 1500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1ajci"]
+atlas = ExtResource("3_rtw2f")
+region = Rect2(1500, 0, 1500, 1500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7b55j"]
+atlas = ExtResource("3_rtw2f")
+region = Rect2(0, 1500, 1500, 1500)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_5pajh"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rcqid")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1ajci")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7b55j")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j7ex8"]
+atlas = ExtResource("4_oa1go")
+region = Rect2(0, 0, 1500, 1500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a8gd2"]
+atlas = ExtResource("4_oa1go")
+region = Rect2(1500, 0, 1500, 1500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hstxw"]
+atlas = ExtResource("4_oa1go")
+region = Rect2(0, 1500, 1500, 1500)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_8egab"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j7ex8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a8gd2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hstxw")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8ln24"]
+atlas = ExtResource("5_tbmy8")
+region = Rect2(0, 0, 1500, 1500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rtw2f"]
+atlas = ExtResource("5_tbmy8")
+region = Rect2(1500, 0, 1500, 1500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oa1go"]
+atlas = ExtResource("5_tbmy8")
+region = Rect2(0, 1500, 1500, 1500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tbmy8"]
+atlas = ExtResource("5_tbmy8")
+region = Rect2(1500, 1500, 1500, 1500)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qywvv"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8ln24")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rtw2f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oa1go")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tbmy8")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_button"]
-bg_color = Color(0.825, 0.332, 0.387, 1)
+bg_color = Color(1, 1, 1, 1)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(0.12, 0.09, 0.11, 1)
+border_color = Color(0, 0, 0, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_button_hover"]
-bg_color = Color(0.94, 0.46, 0.52, 1)
+bg_color = Color(0.74213403, 0.73799837, 0.76248544, 1)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(0.96, 0.82, 0.42, 1)
+border_color = Color(0, 0, 0, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -43,7 +170,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.075, 0.055, 0.067, 1)
+color = Color(0.4478957, 0.34344053, 0.2742918, 1)
 
 [node name="Accent" type="ColorRect" parent="." unique_id=1029000177]
 layout_mode = 1
@@ -52,11 +179,38 @@ anchor_right = 1.0
 offset_bottom = 18.0
 grow_horizontal = 2
 mouse_filter = 2
-color = Color(0.825, 0.332, 0.387, 1)
+color = Color(0, 0, 0, 1)
+
+[node name="shadow" type="AnimatedSprite2D" parent="." unique_id=1441150698]
+position = Vector2(562.0057, 298.00568)
+scale = Vector2(0.75252014, 0.75252014)
+sprite_frames = SubResource("SpriteFrames_flqon")
+autoplay = "default"
+frame_progress = 0.09036777
+
+[node name="boxing" type="AnimatedSprite2D" parent="." unique_id=1081054375]
+position = Vector2(562.0057, 298.00568)
+scale = Vector2(0.75252014, 0.75252014)
+sprite_frames = SubResource("SpriteFrames_5pajh")
+autoplay = "default"
+frame_progress = 0.29071844
+
+[node name="light" type="AnimatedSprite2D" parent="." unique_id=2002881118]
+position = Vector2(562.0057, 298.00568)
+scale = Vector2(0.75252014, 0.75252014)
+sprite_frames = SubResource("SpriteFrames_8egab")
+autoplay = "default"
+frame_progress = 0.9194863
+
+[node name="lightlight" type="AnimatedSprite2D" parent="light" unique_id=1935910246]
+sprite_frames = SubResource("SpriteFrames_qywvv")
+autoplay = "default"
+frame_progress = 0.8680843
 
 [node name="Center" type="CenterContainer" parent="." unique_id=893937135]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
+anchor_top = 0.443
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -67,23 +221,6 @@ custom_minimum_size = Vector2(620, 0)
 layout_mode = 2
 theme_override_constants/separation = 28
 alignment = 1
-
-[node name="Title" type="Label" parent="Center/Menu" unique_id=594471168]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
-theme_override_constants/shadow_offset_x = 5
-theme_override_constants/shadow_offset_y = 6
-theme_override_font_sizes/font_size = 72
-text = "SHADOW BOXING"
-horizontal_alignment = 1
-
-[node name="Placeholder" type="Label" parent="Center/Menu" unique_id=2048721329]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.63, 0.57, 0.6, 1)
-theme_override_font_sizes/font_size = 20
-text = "PLACEHOLDER MAIN MENU"
-horizontal_alignment = 1
 
 [node name="StartButton" type="Button" parent="Center/Menu" unique_id=1620140994]
 custom_minimum_size = Vector2(320, 82)
@@ -105,7 +242,7 @@ custom_minimum_size = Vector2(320, 66)
 layout_mode = 2
 focus_neighbor_top = NodePath("../StartButton")
 focus_neighbor_bottom = NodePath("../StartButton")
-theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_focus_color = Color(0.08, 0.055, 0.065, 1)
 theme_override_colors/font_hover_color = Color(0.08, 0.055, 0.065, 1)
 theme_override_font_sizes/font_size = 24

@@ -577,6 +577,7 @@ texture_filter = 1
 position = Vector2(658.5, 335)
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_ssvqc")
+animation = &"down"
 autoplay = "default"
 
 [node name="light" type="AnimatedSprite2D" parent="." unique_id=1194251676]
