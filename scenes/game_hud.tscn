@@ -2,16 +2,36 @@
 
 [ext_resource type="Script" uid="uid://bu6qdelt6xhu2" path="res://scripts/direction_indicators.gd" id="1_indicators"]
 [ext_resource type="Script" uid="uid://chkbxvjxut345" path="res://scripts/turn_timer_bar.gd" id="2_timer"]
+[ext_resource type="Script" path="res://scripts/hit_tally.gd" id="3_tally"]
 
 [node name="HUD" type="Node" unique_id=1238976661]
 
 [node name="indicators" type="Node2D" parent="." unique_id=695204748]
-position = Vector2(576, 664)
+position = Vector2(576, 792)
 script = ExtResource("1_indicators")
 
 [node name="timerbar" type="Node2D" parent="." unique_id=307830680]
-position = Vector2(576, 728)
+position = Vector2(576, 687)
 script = ExtResource("2_timer")
+
+[node name="hittally" type="Node2D" parent="." unique_id=481920371]
+position = Vector2(576, -143)
+script = ExtResource("3_tally")
+
+[node name="rematch" type="Label" parent="." unique_id=481920372]
+visible = false
+offset_left = 176.0
+offset_top = 762.0
+offset_right = 976.0
+offset_bottom = 822.0
+theme_override_colors/font_color = Color(0.92, 0.88, 0.86, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 4
+theme_override_font_sizes/font_size = 24
+text = "SPACE - REMATCH      ESC - MENU"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="flash" type="CanvasLayer" parent="." unique_id=12403492]
 

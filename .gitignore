@@ -1,3 +1,13 @@
 # Godot 4+ specific ignores
 .godot/
 /addons
+
+# Summer Engine local-only state (SummerGit, caches, locks)
+.summer/local/
+
+# Editor and build scratch files
+*.bak
+*~
+*.tmp
+*.TMP
+~*.dll

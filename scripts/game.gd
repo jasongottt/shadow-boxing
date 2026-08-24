@@ -118,7 +118,13 @@ const MISS_SHAKE_STRENGTH := 7.0
 const FLASH_ALPHA := 0.5
 const FLASH_FADE_DURATION := 0.22
 
+const MAIN_MENU_SCENE_PATH := "res://scenes/main_menu.tscn"
 const WALL_BREAK_DELAY := 1.0
+
+## Long enough after the wall goes that the prompt reads as an offer rather than
+## as an interruption of the win beat.
+const REMATCH_PROMPT_DELAY := 1.2
+const REMATCH_FADE_DURATION := 0.4
 const SWITCH_FLASH_COUNT := 6
 const INTRO_ZOOM_DURATION := 1.12
 const INTRO_ZOOM := 2.2
@@ -144,6 +150,8 @@ const INTRO_ZOOM := 2.2
 # provide these typed controller nodes. Their scene paths are validated in tests.
 @onready var indicators: Variant = $HUD/indicators
 @onready var timer_bar: Variant = $HUD/timerbar
+@onready var hit_tally: Variant = $HUD/hittally
+@onready var rematch_prompt: Label = $HUD/rematch
 @onready var flash_rect: ColorRect = $HUD/flash/rect
 @onready var fighters: Variant = $Presentation/Fighters
 @onready var impacts: Variant = $Presentation/Impacts
@@ -160,6 +168,7 @@ var punch_history: Array[Dictionary] = []
 var switch_after_sequence := false
 var turn_time_left := TURN_TIME
 var idle_time := 0.0
+var awaiting_rematch := false
 
 
 func _ready() -> void:
@@ -504,6 +513,9 @@ func refresh_indicators() -> void:
 			spent.append(direction)
 
 	indicators.set_state(spent, get_attacker_color())
+	# Both readouts describe the same round, and every moment that changes one
+	# changes the other, so they refresh together.
+	hit_tally.set_state(hits, MAX_HITS, get_attacker_color())
 
 
 func get_wall_grade_color() -> Color:
@@ -649,4 +661,51 @@ func break_wall() -> void:
 	$Crack4.hide()
 	fighters.hide_shadow()
 	$Shmile.show()
+
+	await get_tree().create_timer(REMATCH_PROMPT_DELAY).timeout
+
+	offer_rematch()
+
+
+## Until now the wall breaking was the last thing that ever happened: the fight
+## simply stopped, with no way back to a new one short of relaunching.
+func offer_rematch() -> void:
+	rematch_prompt.modulate.a = 0.0
+	rematch_prompt.show()
+	awaiting_rematch = true
+
+	var prompt_tween := create_tween()
+	prompt_tween.tween_property(
+		rematch_prompt, ^"modulate:a", 1.0, REMATCH_FADE_DURATION
+	)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not awaiting_rematch:
+		return
+
+	if event.is_action_pressed(&"ui_cancel"):
+		leave_to_menu()
+	elif event.is_action_pressed(&"ui_accept"):
+		restart_fight()
+
+
+func restart_fight() -> void:
+	end_fight()
+	get_tree().reload_current_scene()
+
+
+func leave_to_menu() -> void:
+	end_fight()
+
+	var error: Error = get_tree().change_scene_to_file(MAIN_MENU_SCENE_PATH)
+	if error != OK:
+		push_error("Game could not open %s (error %d)" % [MAIN_MENU_SCENE_PATH, error])
+
+
+## The hit-stop parks Engine.time_scale globally, so a fight that ended while one
+## was still unwinding would hand the next scene a world running at 5% speed.
+func end_fight() -> void:
+	awaiting_rematch = false
+	Engine.time_scale = 1.0
 #endregion

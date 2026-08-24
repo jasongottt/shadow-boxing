@@ -27,12 +27,14 @@ func test_persistent_controllers_are_attached_in_scene() -> void:
 		"Presentation/CameraEffects": "res://scripts/camera_effects.gd",
 		"HUD/indicators": "res://scripts/direction_indicators.gd",
 		"HUD/timerbar": "res://scripts/turn_timer_bar.gd",
+		"HUD/hittally": "res://scripts/hit_tally.gd",
 	}
 	for node_path: String in expected_scripts:
 		var node: Node = game.get_node(node_path)
 		var script: Script = node.get_script()
 		assert(script.resource_path == expected_scripts[node_path])
 	assert(game.has_node("HUD/flash/rect"))
+	assert(game.has_node("HUD/rematch"))
 	game.free()
 
 
