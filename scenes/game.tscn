@@ -19,10 +19,12 @@
 [ext_resource type="Texture2D" uid="uid://dl6epd0ddldfe" path="res://sprites/youlose.png" id="12_cfp5y"]
 [ext_resource type="Texture2D" uid="uid://dy3smmyik5w72" path="res://sprites/left.png" id="12_ssvqc"]
 [ext_resource type="Texture2D" uid="uid://do3n32e7nc0dw" path="res://sprites/up.png" id="13_rysoc"]
-[ext_resource type="Texture2D" uid="uid://0u5iwky8kddt" path="res://sprites/switch.png" id="14_trtic"]
+[ext_resource type="Texture2D" uid="uid://id2p04fvpdtv" path="res://sprites/switch_hd.png" id="14_trtic"]
 [ext_resource type="Texture2D" uid="uid://5prl7t6mplwu" path="res://sprites/light.png" id="18_ssvqc"]
 [ext_resource type="PackedScene" uid="uid://b6k6jfr7spo1h" path="res://scenes/presentation_controllers.tscn" id="19_presentation"]
 [ext_resource type="PackedScene" uid="uid://dlo4c4fqlikhu" path="res://scenes/game_hud.tscn" id="20_hud"]
+[ext_resource type="AudioStream" uid="uid://b0sn0w0l3h6i1" path="res://sounds/hum.wav" id="21_hum"]
+[ext_resource type="Script" uid="uid://nog6ik70jsn" path="res://scripts/wall_hole.gd" id="22_hole"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wljb1"]
 animations = [{
@@ -469,11 +471,11 @@ animations = [{
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qouja"]
 atlas = ExtResource("14_trtic")
-region = Rect2(0, 0, 172, 172)
+region = Rect2(0, 0, 688, 688)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_pr1ej"]
 atlas = ExtResource("14_trtic")
-region = Rect2(0, 172, 172, 172)
+region = Rect2(0, 688, 688, 688)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_05nbr"]
 animations = [{
@@ -491,17 +493,6 @@ animations = [{
 
 [node name="game" type="Node2D" unique_id=1041176778]
 script = ExtResource("1_dfpl8")
-
-[node name="Youwin" type="Sprite2D" parent="." unique_id=1436997927]
-position = Vector2(564, 176)
-scale = Vector2(0.554245, 0.554245)
-texture = ExtResource("3_6clqb")
-
-[node name="Youwinshadow" type="Sprite2D" parent="." unique_id=2079178948]
-modulate = Color(0, 0, 0, 0.262745)
-position = Vector2(569, 191)
-scale = Vector2(0.554245, 0.554245)
-texture = ExtResource("3_6clqb")
 
 [node name="Wall" type="AnimatedSprite2D" parent="." unique_id=2062302868]
 modulate = Color(0.776471, 0.607843, 0.678431, 1)
@@ -522,7 +513,6 @@ texture = ExtResource("9_7irkr")
 [node name="Crack1" type="Sprite2D" parent="cracks" unique_id=881176193]
 visible = false
 modulate = Color(1, 1, 1, 0.58)
-texture_filter = 1
 position = Vector2(303, 173)
 scale = Vector2(0.35, 0.35)
 texture = ExtResource("7_bob2h")
@@ -530,7 +520,6 @@ texture = ExtResource("7_bob2h")
 [node name="Crack2" type="Sprite2D" parent="cracks" unique_id=2022636578]
 visible = false
 modulate = Color(1, 1, 1, 0.58)
-texture_filter = 1
 position = Vector2(812, 197)
 scale = Vector2(0.27, 0.27)
 texture = ExtResource("8_fx1v0")
@@ -538,13 +527,27 @@ texture = ExtResource("8_fx1v0")
 [node name="Crack3" type="Sprite2D" parent="cracks" unique_id=800829298]
 visible = false
 modulate = Color(1, 1, 1, 0.58)
-texture_filter = 1
 position = Vector2(563, 135)
 scale = Vector2(0.255, 0.255)
 texture = ExtResource("9_7irkr")
 
+[node name="hole" type="Node2D" parent="." unique_id=903930942]
+script = ExtResource("22_hole")
+
+[node name="Youwinshadow" type="Sprite2D" parent="." unique_id=2079178948]
+visible = false
+modulate = Color(0, 0, 0, 0.262745)
+position = Vector2(569, 191)
+scale = Vector2(0.554245, 0.554245)
+texture = ExtResource("3_6clqb")
+
+[node name="Youwin" type="Sprite2D" parent="." unique_id=1436997927]
+visible = false
+position = Vector2(564, 176)
+scale = Vector2(0.554245, 0.554245)
+texture = ExtResource("3_6clqb")
+
 [node name="shadow" type="AnimatedSprite2D" parent="." unique_id=826273536]
-texture_filter = 1
 position = Vector2(642, 277)
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_458eo")
@@ -573,7 +576,6 @@ scale_amount_curve = SubResource("Curve_vcsiq")
 color = Color(0.576471, 0.270588, 0.27451, 1)
 
 [node name="puncher" type="AnimatedSprite2D" parent="." unique_id=1500218699]
-texture_filter = 1
 position = Vector2(658.5, 335)
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_ssvqc")
@@ -595,6 +597,13 @@ shadow_color = Color(0, 0, 0, 0.7647059)
 texture = ExtResource("6_qejtg")
 texture_scale = 0.54
 
+[node name="hum" type="AudioStreamPlayer2D" parent="light" unique_id=1297360807]
+position = Vector2(252, 164)
+stream = ExtResource("21_hum")
+volume_db = -24.0
+autoplay = true
+max_distance = 3000.0
+
 [node name="Shmile" type="Sprite2D" parent="." unique_id=1239723086]
 visible = false
 position = Vector2(573, 499)
@@ -603,14 +612,14 @@ texture = ExtResource("11_qbotp")
 
 [node name="Youlose" type="Sprite2D" parent="." unique_id=1615035388]
 modulate = Color(1, 1, 1, 0)
-position = Vector2(581, 323)
-scale = Vector2(1.41109, 1.41109)
+position = Vector2(576, 311)
+scale = Vector2(1.45, 1.45)
 texture = ExtResource("12_cfp5y")
 
 [node name="switch" type="AnimatedSprite2D" parent="." unique_id=1962884118]
 visible = false
 position = Vector2(599, 291)
-scale = Vector2(0.57374626, 0.5737463)
+scale = Vector2(0.14343657, 0.14343657)
 sprite_frames = SubResource("SpriteFrames_05nbr")
 autoplay = "default"
 frame_progress = 0.9901181

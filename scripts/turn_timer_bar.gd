@@ -40,7 +40,7 @@ func _ready() -> void:
 
 func set_state(new_progress: float, new_bar_color: Color, new_is_active: bool) -> void:
 	progress = clampf(new_progress, 0.0, 1.0)
-	bar_color = new_bar_color
+	bar_color = PlayerColorSettings.readable_on_black(new_bar_color)
 	is_active = new_is_active
 	queue_redraw()
 

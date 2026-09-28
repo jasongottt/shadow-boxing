@@ -2,7 +2,8 @@
 
 [ext_resource type="Script" uid="uid://bu6qdelt6xhu2" path="res://scripts/direction_indicators.gd" id="1_indicators"]
 [ext_resource type="Script" uid="uid://chkbxvjxut345" path="res://scripts/turn_timer_bar.gd" id="2_timer"]
-[ext_resource type="Script" path="res://scripts/hit_tally.gd" id="3_tally"]
+[ext_resource type="Script" uid="uid://ccpdfm16b4b24" path="res://scripts/score_tally.gd" id="4_score"]
+[ext_resource type="Script" uid="uid://bhdj0cfhetg2l" path="res://scripts/pause_menu.gd" id="5_pause"]
 
 [node name="HUD" type="Node" unique_id=1238976661]
 
@@ -14,9 +15,70 @@ script = ExtResource("1_indicators")
 position = Vector2(576, 687)
 script = ExtResource("2_timer")
 
-[node name="hittally" type="Node2D" parent="." unique_id=481920371]
-position = Vector2(576, -143)
-script = ExtResource("3_tally")
+[node name="winner" type="Label" parent="." unique_id=481920373]
+visible = false
+offset_left = 176.0
+offset_top = -183.0
+offset_right = 976.0
+offset_bottom = -103.0
+theme_override_colors/font_color = Color(0.92, 0.88, 0.86, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_offset_y = 5
+theme_override_font_sizes/font_size = 64
+text = "PLAYER ONE WINS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="score" type="Node2D" parent="." unique_id=481920374]
+visible = false
+position = Vector2(576, 706)
+script = ExtResource("4_score")
+
+[node name="callout" type="Control" parent="." unique_id=481920380]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = 176.0
+offset_top = 30.0
+offset_right = 976.0
+offset_bottom = 250.0
+pivot_offset = Vector2(400, 110)
+mouse_filter = 2
+
+[node name="word" type="Label" parent="callout" unique_id=481920381]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 150.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.035, 0.045, 0.6)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 7
+theme_override_constants/shadow_offset_y = 8
+theme_override_constants/outline_size = 22
+theme_override_font_sizes/font_size = 140
+text = "FIGHT!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="sub" type="Label" parent="callout" unique_id=481920382]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -70.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.92, 0.88, 0.86, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 38
+text = "P1 THROWS FIRST"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="rematch" type="Label" parent="." unique_id=481920372]
 visible = false
@@ -28,7 +90,7 @@ theme_override_colors/font_color = Color(0.92, 0.88, 0.86, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
 theme_override_constants/shadow_offset_x = 3
 theme_override_constants/shadow_offset_y = 4
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 30
 text = "SPACE - REMATCH      ESC - MENU"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -43,3 +105,60 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="pause" type="CanvasLayer" parent="." unique_id=481920375]
+layer = 2
+script = ExtResource("5_pause")
+
+[node name="dim" type="ColorRect" parent="pause" unique_id=481920376]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.74)
+
+[node name="title" type="Label" parent="pause" unique_id=481920377]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 400.0
+offset_bottom = 500.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_offset_y = 5
+theme_override_font_sizes/font_size = 92
+text = "PAUSED"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="prompt" type="Label" parent="pause" unique_id=481920378]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 520.0
+offset_bottom = 570.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.86, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 4
+theme_override_font_sizes/font_size = 30
+text = "ESC - RESUME      R - RESTART      M - MENU"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="rules" type="Label" parent="pause" unique_id=481920379]
+visible = false
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 640.0
+offset_bottom = 740.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.72, 0.67, 0.69, 1)
+theme_override_font_sizes/font_size = 22
+text = "Punch where the shadow slips. Three straight hits break the wall.
+Miss, and the roles swap. A shadow that never moves takes the hit."
+horizontal_alignment = 1
+vertical_alignment = 1

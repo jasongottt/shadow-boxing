@@ -50,6 +50,12 @@ func setup(puncher_node: AnimatedSprite2D, shadow_node: AnimatedSprite2D) -> voi
 	shadow = shadow_node
 	build_shadow_materials()
 	build_shadow_rims()
+	# The replay changes pose from tween callbacks, which run after every
+	# node's _process. Syncing only there left the rims a frame behind: each
+	# reset flashed the previous pose, in the defender's colour, around the
+	# idle shadow.
+	shadow.animation_changed.connect(sync_rims)
+	shadow.frame_changed.connect(sync_rims)
 	reset()
 
 
@@ -69,7 +75,6 @@ func build_shadow_rims() -> void:
 		var rim: AnimatedSprite2D = AnimatedSprite2D.new()
 		rim.name = &"shadowrim"
 		rim.sprite_frames = shadow.sprite_frames
-		rim.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		rim.material = shadow_rim_material
 		rim.set_meta(&"rim_offset", rim_offset)
 		visual_parent.add_child(rim)
@@ -78,6 +83,10 @@ func build_shadow_rims() -> void:
 
 
 func _process(_delta: float) -> void:
+	sync_rims()
+
+
+func sync_rims() -> void:
 	if not is_instance_valid(shadow):
 		return
 
@@ -99,9 +108,12 @@ func set_colors(attacker_color: Color, defender_color: Color, alpha: float = 1.0
 	shadow_color.a = alpha
 	puncher.modulate = puncher_color
 	shadow.modulate = shadow_color
-	shadow_material.set_shader_parameter(&"outline_color", defender_color)
 
-	var rim_color: Color = defender_color
+	# The rim and the hit flash are both drawn against the black silhouette.
+	var on_shadow: Color = PlayerColorSettings.readable_on_black(defender_color)
+	shadow_material.set_shader_parameter(&"outline_color", on_shadow)
+
+	var rim_color: Color = on_shadow
 	rim_color.a = 0.72
 	shadow_rim_material.set_shader_parameter(&"rim_color", rim_color)
 

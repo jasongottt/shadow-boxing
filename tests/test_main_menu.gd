@@ -11,6 +11,11 @@ func test_main_menu_has_functional_start_button() -> void:
 	assert(not start_button.disabled)
 	assert(start_button.pressed.is_connected(menu._on_start_button_pressed))
 	assert(ResourceLoader.exists(MainMenu.GAME_SCENE_PATH))
+
+	var cpu_button: Button = menu.get_node("Center/Menu/CpuButton")
+	var quit_button: Button = menu.get_node("Center/Menu/QuitButton")
+	assert(cpu_button.pressed.is_connected(menu._on_cpu_button_pressed))
+	assert(quit_button.pressed.is_connected(menu._on_quit_button_pressed))
 	menu.free()
 
 
@@ -28,6 +33,11 @@ func test_customize_panel_and_color_settings_are_available() -> void:
 	assert(player_one_picker.color_changed.is_connected(menu._on_player_one_color_changed))
 	assert(player_two_picker.color_changed.is_connected(menu._on_player_two_color_changed))
 	assert(not customize_panel.visible)
+
+	var back_button: Button = menu.get_node("Center/Customize/Buttons/BackButton")
+	var reset_button: Button = menu.get_node("Center/Customize/Buttons/ResetButton")
+	assert(back_button.pressed.is_connected(menu._on_back_button_pressed))
+	assert(reset_button.pressed.is_connected(menu._on_reset_colors_pressed))
 
 	var custom_one: Color = Color(0.95, 0.72, 0.18, 1.0)
 	var custom_two: Color = Color(0.26, 0.84, 0.58, 1.0)

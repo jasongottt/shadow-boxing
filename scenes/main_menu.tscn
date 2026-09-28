@@ -5,6 +5,8 @@
 [ext_resource type="Texture2D" uid="uid://xcydmqy25c6" path="res://sprites/titleboxing.png" id="3_rtw2f"]
 [ext_resource type="Texture2D" uid="uid://bsggytnhwn4b5" path="res://sprites/titlelight.png" id="4_oa1go"]
 [ext_resource type="Texture2D" uid="uid://dfm7jf1vlbvic" path="res://sprites/titlelightlight.png" id="5_tbmy8"]
+[ext_resource type="Texture2D" uid="uid://jiei31udl31m" path="res://sprites/idletest.png" id="6_idle"]
+[ext_resource type="Script" uid="uid://4xr3uc4spglt" path="res://scripts/ink_style_box.gd" id="7_ink"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jk1qb"]
 atlas = ExtResource("2_8ln24")
@@ -129,29 +131,33 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_button"]
-bg_color = Color(1, 1, 1, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0, 0, 0, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+[sub_resource type="StyleBox" id="StyleBox_button"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+script = ExtResource("7_ink")
+shadow_color = Color(0, 0, 0, 0.35)
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_button_hover"]
-bg_color = Color(0.74213403, 0.73799837, 0.76248544, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0, 0, 0, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+[sub_resource type="StyleBox" id="StyleBox_button_hover"]
+resource_local_to_scene = false
+resource_name = ""
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+script = ExtResource("7_ink")
+fill_color = Color(0.74213403, 0.73799837, 0.76248544, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_preview_one"]
+atlas = ExtResource("6_idle")
+region = Rect2(216, 244, 192, 236)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_preview_two"]
+atlas = ExtResource("6_idle")
+region = Rect2(216, 244, 192, 236)
 
 [node name="MainMenu" type="Control" unique_id=18911045]
 layout_mode = 3
@@ -217,71 +223,100 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Menu" type="VBoxContainer" parent="Center" unique_id=1016007651]
-custom_minimum_size = Vector2(620, 0)
 layout_mode = 2
-theme_override_constants/separation = 28
+theme_override_constants/separation = 20
 alignment = 1
 
 [node name="StartButton" type="Button" parent="Center/Menu" unique_id=1620140994]
 custom_minimum_size = Vector2(320, 82)
 layout_mode = 2
-focus_neighbor_top = NodePath("../CustomizeButton")
+focus_neighbor_top = NodePath("../QuitButton")
+focus_neighbor_bottom = NodePath("../CpuButton")
+theme_override_colors/font_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_colors/font_focus_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_colors/font_hover_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_colors/font_disabled_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = SubResource("StyleBox_button")
+theme_override_styles/pressed = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button")
+theme_override_styles/disabled = SubResource("StyleBox_button_hover")
+theme_override_styles/focus = SubResource("StyleBox_button_hover")
+text = "START GAME"
+
+[node name="CpuButton" type="Button" parent="Center/Menu" unique_id=1620140995]
+custom_minimum_size = Vector2(320, 66)
+layout_mode = 2
+focus_neighbor_top = NodePath("../StartButton")
 focus_neighbor_bottom = NodePath("../CustomizeButton")
 theme_override_colors/font_color = Color(0.08, 0.055, 0.065, 1)
 theme_override_colors/font_focus_color = Color(0.08, 0.055, 0.065, 1)
 theme_override_colors/font_hover_color = Color(0.08, 0.055, 0.065, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_colors/font_disabled_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_font_sizes/font_size = 29
 theme_override_styles/normal = SubResource("StyleBox_button")
 theme_override_styles/pressed = SubResource("StyleBox_button_hover")
-theme_override_styles/hover = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button")
+theme_override_styles/disabled = SubResource("StyleBox_button_hover")
 theme_override_styles/focus = SubResource("StyleBox_button_hover")
-text = "START GAME"
+text = "VS CPU"
 
 [node name="CustomizeButton" type="Button" parent="Center/Menu" unique_id=2065317317]
 custom_minimum_size = Vector2(320, 66)
 layout_mode = 2
-focus_neighbor_top = NodePath("../StartButton")
-focus_neighbor_bottom = NodePath("../StartButton")
+focus_neighbor_top = NodePath("../CpuButton")
+focus_neighbor_bottom = NodePath("../QuitButton")
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_focus_color = Color(0.08, 0.055, 0.065, 1)
 theme_override_colors/font_hover_color = Color(0.08, 0.055, 0.065, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 29
 theme_override_styles/normal = SubResource("StyleBox_button")
 theme_override_styles/pressed = SubResource("StyleBox_button_hover")
-theme_override_styles/hover = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button")
 theme_override_styles/focus = SubResource("StyleBox_button_hover")
 text = "CUSTOMIZE"
 
+[node name="QuitButton" type="Button" parent="Center/Menu" unique_id=2065317318]
+custom_minimum_size = Vector2(320, 66)
+layout_mode = 2
+focus_neighbor_top = NodePath("../CustomizeButton")
+focus_neighbor_bottom = NodePath("../StartButton")
+theme_override_colors/font_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_colors/font_focus_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_colors/font_hover_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_font_sizes/font_size = 29
+theme_override_styles/normal = SubResource("StyleBox_button")
+theme_override_styles/pressed = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button")
+theme_override_styles/focus = SubResource("StyleBox_button_hover")
+text = "QUIT"
+
 [node name="Controls" type="Label" parent="Center/Menu" unique_id=655039777]
+visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.72, 0.67, 0.69, 1)
-theme_override_font_sizes/font_size = 18
-text = "ARROW KEYS: PUNCH     |     WASD: DODGE
-Roles swap after a missed punch"
+theme_override_font_sizes/font_size = 22
+text = "P1: ARROW KEYS     |     P2: WASD     |     ESC: PAUSE
+Punch where the shadow slips. Three straight hits break the wall.
+Miss, and the roles swap."
 horizontal_alignment = 1
 
 [node name="Customize" type="VBoxContainer" parent="Center" unique_id=1765355283]
 visible = false
 custom_minimum_size = Vector2(760, 0)
 layout_mode = 2
-theme_override_constants/separation = 26
+theme_override_constants/separation = 18
 alignment = 1
 
 [node name="Title" type="Label" parent="Center/Customize" unique_id=1136544321]
+custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
 theme_override_constants/shadow_offset_x = 4
 theme_override_constants/shadow_offset_y = 5
-theme_override_font_sizes/font_size = 52
+theme_override_font_sizes/font_size = 50
 text = "CHOOSE YOUR COLORS"
-horizontal_alignment = 1
-
-[node name="Hint" type="Label" parent="Center/Customize" unique_id=1704441375]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.66, 0.6, 0.63, 1)
-theme_override_font_sizes/font_size = 18
-text = "Colors carry into the fighters, HUD, hit words, and wall lighting"
 horizontal_alignment = 1
 
 [node name="Players" type="HBoxContainer" parent="Center/Customize" unique_id=469371123]
@@ -292,26 +327,37 @@ alignment = 1
 [node name="PlayerOne" type="VBoxContainer" parent="Center/Customize/Players" unique_id=1809394272]
 custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 10
 alignment = 1
 
 [node name="Label" type="Label" parent="Center/Customize/Players/PlayerOne" unique_id=1780883452]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 31
 text = "PLAYER ONE"
 horizontal_alignment = 1
 
-[node name="Preview" type="ColorRect" parent="Center/Customize/Players/PlayerOne" unique_id=17767577]
-custom_minimum_size = Vector2(220, 150)
+[node name="Preview" type="TextureRect" parent="Center/Customize/Players/PlayerOne" unique_id=17767577]
+self_modulate = Color(0.825, 0.332, 0.387, 1)
+texture_filter = 2
+custom_minimum_size = Vector2(220, 184)
 layout_mode = 2
 mouse_filter = 2
-color = Color(0.825, 0.332, 0.387, 1)
+texture = SubResource("AtlasTexture_preview_one")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="ColorPicker" type="ColorPickerButton" parent="Center/Customize/Players/PlayerOne" unique_id=1110210462]
-custom_minimum_size = Vector2(220, 58)
+custom_minimum_size = Vector2(220, 54)
 layout_mode = 2
+focus_neighbor_left = NodePath("../../PlayerTwo/ColorPicker")
+focus_neighbor_right = NodePath("../../PlayerTwo/ColorPicker")
+focus_neighbor_bottom = NodePath("../../../Buttons/ResetButton")
 theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBox_button")
+theme_override_styles/pressed = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button")
+theme_override_styles/focus = SubResource("StyleBox_button_hover")
 text = "CHOOSE COLOR"
 color = Color(0.825, 0.332, 0.387, 1)
 edit_alpha = false
@@ -319,55 +365,90 @@ edit_alpha = false
 [node name="PlayerTwo" type="VBoxContainer" parent="Center/Customize/Players" unique_id=164329517]
 custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 10
 alignment = 1
 
 [node name="Label" type="Label" parent="Center/Customize/Players/PlayerTwo" unique_id=2124007480]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 31
 text = "PLAYER TWO"
 horizontal_alignment = 1
 
-[node name="Preview" type="ColorRect" parent="Center/Customize/Players/PlayerTwo" unique_id=1539596295]
-custom_minimum_size = Vector2(220, 150)
+[node name="Preview" type="TextureRect" parent="Center/Customize/Players/PlayerTwo" unique_id=1539596295]
+self_modulate = Color(0.319, 0.533, 0.769, 1)
+texture_filter = 2
+custom_minimum_size = Vector2(220, 184)
 layout_mode = 2
 mouse_filter = 2
-color = Color(0.319, 0.533, 0.769, 1)
+texture = SubResource("AtlasTexture_preview_two")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="ColorPicker" type="ColorPickerButton" parent="Center/Customize/Players/PlayerTwo" unique_id=307432437]
-custom_minimum_size = Vector2(220, 58)
+custom_minimum_size = Vector2(220, 54)
 layout_mode = 2
+focus_neighbor_left = NodePath("../../PlayerOne/ColorPicker")
+focus_neighbor_right = NodePath("../../PlayerOne/ColorPicker")
+focus_neighbor_bottom = NodePath("../../../Buttons/BackButton")
 theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBox_button")
+theme_override_styles/pressed = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button")
+theme_override_styles/focus = SubResource("StyleBox_button_hover")
 text = "CHOOSE COLOR"
 color = Color(0.319, 0.533, 0.769, 1)
 edit_alpha = false
 
-[node name="ResetButton" type="Button" parent="Center/Customize" unique_id=1468639730]
-custom_minimum_size = Vector2(260, 54)
+[node name="Hint" type="Label" parent="Center/Customize" unique_id=1704441375]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.9, 0.86, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.72, 0.67, 0.69, 1)
+theme_override_font_sizes/font_size = 21
+text = "Colors carry into the fighters, HUD, hit words, and wall lighting"
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="Center/Customize" unique_id=1468639731]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="ResetButton" type="Button" parent="Center/Customize/Buttons" unique_id=1468639730]
+custom_minimum_size = Vector2(280, 62)
+layout_mode = 2
+focus_neighbor_left = NodePath("../BackButton")
+focus_neighbor_top = NodePath("../../Players/PlayerOne/ColorPicker")
+focus_neighbor_right = NodePath("../BackButton")
+theme_override_colors/font_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_colors/font_focus_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_colors/font_hover_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_font_sizes/font_size = 27
 theme_override_styles/normal = SubResource("StyleBox_button")
 theme_override_styles/pressed = SubResource("StyleBox_button_hover")
-theme_override_styles/hover = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button")
 theme_override_styles/focus = SubResource("StyleBox_button_hover")
 text = "RESET COLORS"
 
-[node name="BackButton" type="Button" parent="Center/Customize" unique_id=1048275664]
-custom_minimum_size = Vector2(320, 66)
+[node name="BackButton" type="Button" parent="Center/Customize/Buttons" unique_id=1048275664]
+custom_minimum_size = Vector2(280, 62)
 layout_mode = 2
+focus_neighbor_left = NodePath("../ResetButton")
+focus_neighbor_top = NodePath("../../Players/PlayerTwo/ColorPicker")
+focus_neighbor_right = NodePath("../ResetButton")
 theme_override_colors/font_color = Color(0.08, 0.055, 0.065, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_colors/font_focus_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_colors/font_hover_color = Color(0.08, 0.055, 0.065, 1)
+theme_override_font_sizes/font_size = 27
 theme_override_styles/normal = SubResource("StyleBox_button")
 theme_override_styles/pressed = SubResource("StyleBox_button_hover")
-theme_override_styles/hover = SubResource("StyleBox_button_hover")
+theme_override_styles/hover = SubResource("StyleBox_button")
 theme_override_styles/focus = SubResource("StyleBox_button_hover")
 text = "BACK"
 
 [connection signal="pressed" from="Center/Menu/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="Center/Menu/CpuButton" to="." method="_on_cpu_button_pressed"]
 [connection signal="pressed" from="Center/Menu/CustomizeButton" to="." method="_on_customize_button_pressed"]
+[connection signal="pressed" from="Center/Menu/QuitButton" to="." method="_on_quit_button_pressed"]
 [connection signal="color_changed" from="Center/Customize/Players/PlayerOne/ColorPicker" to="." method="_on_player_one_color_changed"]
 [connection signal="color_changed" from="Center/Customize/Players/PlayerTwo/ColorPicker" to="." method="_on_player_two_color_changed"]
-[connection signal="pressed" from="Center/Customize/ResetButton" to="." method="_on_reset_colors_pressed"]
-[connection signal="pressed" from="Center/Customize/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="Center/Customize/Buttons/ResetButton" to="." method="_on_reset_colors_pressed"]
+[connection signal="pressed" from="Center/Customize/Buttons/BackButton" to="." method="_on_back_button_pressed"]

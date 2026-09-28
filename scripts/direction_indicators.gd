@@ -31,49 +31,48 @@ const SPENT_COLOR := Color(0.72, 0.68, 0.68, 0.4)
 const OUTLINE_WIDTH := 5.0
 const INK_WOBBLE := 2.2
 
-## Lock-in marks sit either side of the arrow cluster: attacker left, defender
-## right, far enough out to stay clear of the horizontal arrows.
-const LOCK_MARK_OFFSET := 150.0
-const LOCK_MARK_RADIUS := 24.0
-const LOCK_MARK_UNLIT_ALPHA := 0.6
-const LOCK_WOBBLE := 1.9
-
-## Both player colours are dark enough to disappear against the bar, so an
-## unlit ring is pulled toward bone until it reads — far enough to stay legible,
-## not so far that you lose whose ring it is.
+## Both player colours are dark enough to disappear against the bar, so the
+## role caption is pulled toward bone until it reads.
 const BONE_COLOR := Color(0.92, 0.88, 0.86)
-const UNLIT_BONE_MIX := 0.45
 
-## Fixed per-shape seeds keep each arrow wonky in its own particular way while
-## still redrawing identically every frame.
-const ATTACKER_SEED := 11
-const DEFENDER_SEED := 23
+## Either side of the cluster is captioned, attacker left and defender right:
+## the role in that player's colour, and under it whose keys drive it. Roles
+## swap on every miss, and without this the only way to find out you were now
+## dodging was to punch and see nothing.
+const CAPTION_GAP := 40.0
+const CAPTION_WIDTH := 220.0
+const ROLE_FONT_SIZE := 29
+const KEYS_FONT_SIZE := 19
+const ROLE_BASELINE := 1.0
+const KEYS_BASELINE := 24.0
+const CAPTION_BONE_MIX := 0.25
+const CAPTION_KEYS_COLOR := Color(0.72, 0.68, 0.68, 0.8)
 
 var spent_directions: Array[int] = []
 var active_color := Color(0.92, 0.88, 0.86, 0.95)
 var attacker_color := Color(0.92, 0.88, 0.86, 0.95)
 var defender_color := Color(0.92, 0.88, 0.86, 0.95)
-var attacker_locked := false
-var defender_locked := false
+var attacker_caption := ""
+var defender_caption := ""
 
 
 func set_state(new_spent_directions: Array[int], new_active_color: Color) -> void:
 	spent_directions = new_spent_directions.duplicate()
-	active_color = new_active_color
+	active_color = PlayerColorSettings.readable_on_black(new_active_color)
 	queue_redraw()
 
 
-## Shows *that* a player has committed, never *which* direction they picked.
-func set_lock_state(
-	new_attacker_locked: bool,
-	new_defender_locked: bool,
+## Who is on each side, e.g. "P1 · ARROWS". Only changes when roles swap.
+func set_captions(
+	new_attacker_caption: String,
+	new_defender_caption: String,
 	new_attacker_color: Color,
 	new_defender_color: Color,
 ) -> void:
-	attacker_locked = new_attacker_locked
-	defender_locked = new_defender_locked
-	attacker_color = new_attacker_color
-	defender_color = new_defender_color
+	attacker_caption = new_attacker_caption
+	defender_caption = new_defender_caption
+	attacker_color = PlayerColorSettings.readable_on_black(new_attacker_color)
+	defender_color = PlayerColorSettings.readable_on_black(new_defender_color)
 	queue_redraw()
 
 
@@ -88,26 +87,36 @@ func _draw() -> void:
 		else:
 			draw_colored_polygon(points, active_color)
 
-	draw_lock_mark(
-		Vector2(-LOCK_MARK_OFFSET, 0.0), attacker_color, attacker_locked, ATTACKER_SEED
+	draw_caption(-1.0, "PUNCH", attacker_caption, attacker_color)
+	draw_caption(1.0, "DODGE", defender_caption, defender_color)
+
+
+func draw_caption(side: float, role: String, keys: String, color: Color) -> void:
+	var font := ThemeDB.fallback_font
+	var inner_edge := ARROW_TIP + CAPTION_GAP
+	var x := -inner_edge - CAPTION_WIDTH if side < 0.0 else inner_edge
+	var alignment := (
+		HORIZONTAL_ALIGNMENT_RIGHT if side < 0.0 else HORIZONTAL_ALIGNMENT_LEFT
 	)
-	draw_lock_mark(
-		Vector2(LOCK_MARK_OFFSET, 0.0), defender_color, defender_locked, DEFENDER_SEED
+
+	draw_string(
+		font,
+		Vector2(x, ROLE_BASELINE),
+		role,
+		alignment,
+		CAPTION_WIDTH,
+		ROLE_FONT_SIZE,
+		color.lerp(BONE_COLOR, CAPTION_BONE_MIX),
 	)
-
-
-func draw_lock_mark(
-	centre: Vector2, color: Color, is_locked: bool, seed_value: int
-) -> void:
-	var ring := HandDrawn.rough_circle(centre, LOCK_MARK_RADIUS, LOCK_WOBBLE, seed_value)
-
-	if is_locked:
-		draw_colored_polygon(ring, color)
-		return
-
-	var unlit := color.lerp(BONE_COLOR, UNLIT_BONE_MIX)
-	unlit.a = LOCK_MARK_UNLIT_ALPHA
-	draw_polyline(HandDrawn.to_outline(ring), unlit, OUTLINE_WIDTH, true)
+	draw_string(
+		font,
+		Vector2(x, KEYS_BASELINE),
+		keys,
+		alignment,
+		CAPTION_WIDTH,
+		KEYS_FONT_SIZE,
+		CAPTION_KEYS_COLOR,
+	)
 
 
 ## A shafted arrow rather than a bare triangle: the notch where the head meets

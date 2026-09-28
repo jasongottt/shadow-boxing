@@ -53,12 +53,10 @@ func build_hit_word() -> void:
 	hit_word_shadow = Sprite2D.new()
 	hit_word_shadow.name = &"shadow"
 	hit_word_shadow.position = Vector2(6.0, 7.0)
-	hit_word_shadow.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	hit_word.add_child(hit_word_shadow)
 
 	hit_word_sprite = Sprite2D.new()
 	hit_word_sprite.name = &"word"
-	hit_word_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	hit_word.add_child(hit_word_sprite)
 	hit_word.hide()
 
